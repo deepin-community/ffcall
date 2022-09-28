@@ -1,0 +1,14 @@
+usr/include/
+usr/lib/*/libffcall.so
+usr/lib/*/libffcall.a
+usr/lib/*/libcallback.so
+usr/lib/*/libcallback.a
+usr/lib/*/libavcall.so
+usr/lib/*/libavcall.a
+usr/lib/*/libtrampoline.so
+usr/lib/*/libtrampoline.a
+usr/lib/*/libvacall.a
+usr/share/man/man3/vacall.3
+usr/share/man/man3/callback.3
+usr/share/man/man3/avcall.3
+usr/share/man/man3/trampoline.3

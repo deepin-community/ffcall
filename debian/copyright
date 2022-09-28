@@ -1,0 +1,176 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: libffcall
+Upstream-Contact: libffcall@gnu.org
+Source: https://savannah.gnu.org/projects/libffcall/
+
+Files: *
+Copyright: 1993-1995 Bill Triggs <Bill.Triggs@inrialpes.fr>        (original avcall)
+           1995-2021 Bruno Haible <bruno@clisp.org>                (everything)
+           1997      Jörg Höhle <Joerg.Hoehle@gmd.de>              (m68k AmigaOS support)
+           2000      Adam Fedor <fedor@gnu.org>                    (PowerPC MacOS support)
+           2001-2012 Sam Steingold <sds@gnu.org>                   (build infrastructure)
+           2001-2002 Gerhard Tonn <GerhardTonn@swol.de> <gt@debian.org> (s390 support)
+           2004      Paul Guyot <pguyot@kallisys.net>              (PowerPC MacOS support)
+           2005      Thiemo Seufer <ths@debian.org>                (MIPS EL support)
+           2009      Max Lapan <max.lapan@gmail.com>               (ARM EL support)
+           2010      Valery Ushakov <uwe@netbsd.org>               (SPARC64 improvements)
+           1993-2020, Free Software Foundation, Inc.
+License: GPL-2+
+
+Files: callback/callback.3
+       callback/trampoline_r/trampoline_r.3
+       trampoline/trampoline.3
+       vacall/vacall.3
+Copyright: 1995-2017, Bruno Haible
+License: GFDL-NIV-1.2+ or GPL-2+
+
+Files: gnulib-lib/*
+Copyright: 1994-2021, Free Software Foundation, Inc.
+License: LGPL-2.1+
+
+Files: gnulib-lib/_Noreturn.h
+       gnulib-lib/arg-nonnull.h
+       gnulib-lib/c++defs.h
+       gnulib-lib/warn-on-use.h
+Copyright: 2009-2021, Free Software Foundation, Inc.
+License: LGPL-2+
+
+Files: gnulib-m4/*
+       m4/endianness.m4
+       m4/ltoptions.m4
+       m4/ltversion.m4
+       m4/libtool.m4
+       m4/ltsugar.m4
+       m4/lt~obsolete.m4
+       m4/mmap-anon.m4
+Copyright: 1992-2021, Free Software Foundation, Inc.
+License: FSFUL
+ This file is free software; the Free Software Foundation
+ gives unlimited permission to copy and/or distribute it,
+ with or without modifications, as long as this notice is preserved.
+
+Files: gnulib-m4/gnulib-cache.m4
+       gnulib-m4/gnulib-comp.m4
+Copyright: 2002-2021, Free Software Foundation, Inc.
+License: GPL-3+ with Autoconf exception
+
+Files: gnulib-m4/std-gnu11.m4
+Copyright: 2001-2021, Free Software Foundation, Inc.
+License: GPL-3+
+
+Files: debian/*
+Copyright: 2001-2002 Matthew Danish <mdanish@andrew.cmu.edu>
+           2003-2006 Matthias Klose <doko@debian.org>
+           2006 Hubert Chan <uhoreg@debian.org>
+           2010-2016 Christoph Egger <christoph@debian.org>
+           2017-2021 Sébastien Villemot <sebastien@debian.org>
+License: GPL-2+
+
+License: GPL-2+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2,
+ or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along
+ with this program. If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License, version 2, can be found in the file
+ `/usr/share/common-licenses/GPL-2'.
+
+License: GPL-3+
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2,
+ or (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along
+ with this program. If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License, version 3, can be found in the file
+ `/usr/share/common-licenses/GPL-3'.
+
+License: GPL-3+ with Autoconf exception
+ This program is free software: you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the
+ Free Software Foundation, either version 3 of the License, or (at your
+ option) any later version.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along
+ with this program. If not, see <http://www.gnu.org/licenses/>.
+ .
+ On Debian systems, the complete text of the GNU General Public
+ License, version 3, can be found in the file
+ `/usr/share/common-licenses/GPL-3'.
+ .
+ As a special exception to the GNU General Public License,
+ this file may be distributed as part of a program
+ that contains a configuration script generated by Autoconf, under
+ the same distribution terms as the rest of that program.
+
+License: GFDL-NIV-1.2+
+ This manual is covered by the GNU FDL.  Permission is granted to copy,
+ distribute and/or modify this document under the terms of the
+ GNU Free Documentation License (FDL), either version 1.2 of the
+ License, or (at your option) any later version published by the
+ Free Software Foundation (FSF); with no Invariant Sections, with no
+ Front-Cover Text, and with no Back-Cover Texts
+ .
+ A copy of the license is at <https://www.gnu.org/licenses/old-licenses/fdl-1.2>.
+ .
+ On Debian systems, the complete text of the GNU Free Documentation
+ License, version 1.2, can be found in the file
+ `/usr/share/common-licenses/GFDL-1.2'.
+
+License: LGPL-2+
+ This file is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as
+ published by the Free Software Foundation; either version 2 of the
+ License, or (at your option) any later version.
+ .
+ This file is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Library General Public License for more details.
+ .
+ You should have received a copy of the GNU Library General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ .
+ On Debian systems, the complete text of the GNU Library General Public
+ License, version 2, can be found in the file
+ `/usr/share/common-licenses/LGPL-2'.
+
+License: LGPL-2.1+
+ This file is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as
+ published by the Free Software Foundation; either version 2.1 of the
+ License, or (at your option) any later version.
+ .
+ This file is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+ .
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+ .
+ On Debian systems, the complete text of the GNU Lesser General Public
+ License, version 2.1, can be found in the file
+ `/usr/share/common-licenses/LGPL-2.1'.

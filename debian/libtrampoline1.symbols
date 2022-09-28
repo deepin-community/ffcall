@@ -1,0 +1,8 @@
+libtrampoline.so.1 libtrampoline1 #MINVER#
+* Build-Depends-Package: libffcall-dev
+ alloc_trampoline@Base 2.0
+ free_trampoline@Base 2.0
+ is_trampoline@Base 2.0
+ trampoline_address@Base 2.0
+ trampoline_data@Base 2.0
+ trampoline_variable@Base 2.0
