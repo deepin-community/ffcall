@@ -2,7 +2,5 @@
 
 include /usr/share/dpkg/default.mk
 
-export ACLOCAL = aclocal -I$(CURDIR)/m4 -I$(CURDIR)/gnulib-m4
-
 %:
 	dh $@ --no-parallel
