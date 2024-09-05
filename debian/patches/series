@@ -1,2 +1,6 @@
 m4-dirs.patch
 riscv64-pic.patch
+0001-loongarch-Add-support-for-loongarch64-ABI.patch
+0002-loongarch-Use-the-now-released-GCC-12.patch
+0003-Fix-compilation-error-with-ISO-C-23-compliant-compil.patch
+0004-HACK-use-standard-__loongarch64_lp64-macro.patch
