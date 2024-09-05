@@ -1,8 +1,21 @@
-ffcall (2.4-1deepin1) unstable; urgency=medium
+ffcall (2.4-2.1) unstable; urgency=medium
 
-  * fix: switch to libtool 2.4.7
+  * Non-maintainer upload.
+  * fix ftbfs on riscv64 and this is rdep of clisp which to bootstrap sbcl on
+    riscv64. (Closes: #1038803)
 
- -- Chang Yang <yangchang@deepin.org>  Wed, 24 Jan 2024 16:56:22 +0800
+ -- Bo YU <tsu.yubo@gmail.com>  Wed, 21 Jun 2023 06:07:35 +0800
+
+ffcall (2.4-2) unstable; urgency=medium
+
+  * d/copyright: fix short license name (FSFULLR instead of FSFUL)
+  * m4-dirs.patch: new patch, to tell Autoconf where to look for local macros.
+    As a consequence, no longer pass these directories as arguments to aclocal
+    in debian/rules. Libtool macros are thus properly updated by dh-autoreconf.
+    (Closes: #1011808)
+  * Bump S-V to 4.6.1
+  
+ -- Sébastien Villemot <sebastien@debian.org>  Wed, 08 Jun 2022 10:34:29 +0200
 
 ffcall (2.4-1) unstable; urgency=medium
 

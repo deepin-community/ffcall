@@ -44,7 +44,7 @@ Files: gnulib-m4/*
        m4/lt~obsolete.m4
        m4/mmap-anon.m4
 Copyright: 1992-2021, Free Software Foundation, Inc.
-License: FSFUL
+License: FSFULLR
  This file is free software; the Free Software Foundation
  gives unlimited permission to copy and/or distribute it,
  with or without modifications, as long as this notice is preserved.

@@ -1,1 +1,2 @@
-libtool-2.4.7.patch
+m4-dirs.patch
+riscv64-pic.patch
