@@ -8,7 +8,7 @@ FUNBEGIN(callback_receiver)
 	mov	ip, sp
 	stmfd	sp!, {r4, fp, ip, lr, pc}
 	mov	r2, $0
-	sub	fp, ip, $4
+	sub	fp, ip, $-4294967292
 	sub	sp, sp, $32
 	ldr	r4, [fp, $4]
 	str	r2, [fp, $-28]
@@ -95,7 +95,7 @@ FUNBEGIN(callback_get_receiver)
 	ldr	r3, L(44)+4
 L(43):
 	add	sl, pc, sl
-	sub	fp, ip, $4
+	sub	fp, ip, $-4294967292
 	add	r0, sl, r3
 	ldmea	fp, {sl, fp, sp, pc}
 L(45):

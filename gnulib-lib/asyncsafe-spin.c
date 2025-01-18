@@ -1,5 +1,5 @@
 /* Spin locks for communication between threads and signal handlers.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -21,10 +21,12 @@
 /* Specification.  */
 #include "asyncsafe-spin.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 #if defined _AIX
 # include <sys/atomic_op.h>
+#endif
+#if 0x590 <= __SUNPRO_C && __STDC__
+# define asm __asm
 #endif
 
 #if defined _WIN32 && ! defined __CYGWIN__
@@ -68,7 +70,7 @@ asyncsafe_spin_destroy (asyncsafe_spinlock_t *lock)
    require to link with -latomic.  */
 
 #  if (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) \
-       || __clang_major > 3 || (__clang_major__ == 3 && __clang_minor__ >= 1)) \
+       || __clang_major__ > 3 || (__clang_major__ == 3 && __clang_minor__ >= 1)) \
       && !defined __ibmxl__
 /* Use GCC built-ins (available in GCC >= 4.7 and clang >= 3.1) that operate on
    the first byte of the lock.
@@ -132,10 +134,9 @@ do_unlock (asyncsafe_spinlock_t *lock)
 #   endif
 
 #  elif (((__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 1)) \
-          && !defined __sparc__) \
-         || __clang_major__ >= 3) \
-        && !defined __ibmxl__
-/* Use GCC built-ins (available in GCC >= 4.1, except on SPARC, and
+          || __clang_major__ >= 3) \
+         && HAVE_ATOMIC_COMPARE_AND_SWAP_GCC41)
+/* Use GCC built-ins (available on many platforms with GCC >= 4.1 or
    clang >= 3.0).
    Documentation:
    <https://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Atomic-Builtins.html>  */

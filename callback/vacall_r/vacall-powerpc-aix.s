@@ -63,23 +63,23 @@ callback_receiver:
 	cmpwi 0,9,0
 	beq- 0,L..1
 	cmpwi 0,9,1
-	beq- 0,L..41
+	beq- 0,L..40
 	cmpwi 0,9,2
-	beq- 0,L..42
-	cmpwi 0,9,3
 	beq- 0,L..41
+	cmpwi 0,9,3
+	beq- 0,L..40
 	cmpwi 0,9,4
-	beq- 0,L..43
+	beq- 0,L..42
 	cmpwi 0,9,5
-	beq- 0,L..44
+	beq- 0,L..43
 	cmpwi 0,9,6
-	beq- 0,L..40
+	beq- 0,L..39
 	cmpwi 0,9,7
-	beq- 0,L..40
+	beq- 0,L..39
 	cmpwi 0,9,8
-	beq- 0,L..40
+	beq- 0,L..39
 	cmpwi 0,9,9
-	beq- 0,L..40
+	beq- 0,L..39
 	addi 0,9,-10
 	cmplwi 0,0,1
 	bgt- 0,L..22
@@ -95,60 +95,105 @@ L..1:
 	blr
 L..22:
 	cmpwi 0,9,12
-	beq- 0,L..45
+	beq- 0,L..44
 	cmpwi 0,9,13
-	beq- 0,L..46
+	beq- 0,L..45
 	cmpwi 0,9,14
-	beq- 0,L..40
+	beq- 0,L..39
 	cmpwi 0,9,15
 	bne+ 0,L..1
 	lwz 0,56(31)
 	andi. 9,0,1024
 	beq- 0,L..1
-	lwz 0,84(31)
-	cmpwi 0,0,1
-	beq- 0,L..47
-	cmpwi 0,0,2
-	beq- 0,L..48
-	cmpwi 0,0,4
-	beq- 0,L..49
-	cmpwi 0,0,8
-	bne+ 0,L..1
-	lwz 9,76(31)
-	lwz 4,4(9)
+	lwz 9,84(31)
+	addi 0,9,-1
+	cmplwi 0,0,7
+	bgt- 0,L..1
+	cmplwi 0,9,4
+	lwz 0,76(31)
+	rlwinm 8,0,0,30,31
+	rlwinm 6,0,0,0,29
+	add 5,8,9
+	bgt- 0,L..33
+	cmplwi 0,5,4
+	slwi 0,8,3
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 7,9,-1
+	bgt- 0,L..34
+	lwz 9,0(6)
+	slwi 0,5,3
+	and 9,9,7
+	subfic 0,0,32
+	sraw 3,9,0
+	b L..1
+L..34:
+	lwz 0,0(6)
+	slwi 9,5,3
+	lwz 10,4(6)
+	subfic 8,9,64
+	and 0,0,7
+	addi 9,9,-32
+	slw 0,0,9
+	sraw 10,10,8
+	or 3,0,10
+	b L..1
+L..33:
+	cmplwi 0,5,8
+	slwi 0,8,3
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 29,9,-1
+	bgt- 0,L..37
+	lwz 7,0(6)
+	slwi 10,5,2
+	and 7,7,29
+	addi 10,10,-16
+	lwz 8,4(6)
+	slwi 9,5,3
+	subfic 9,9,64
+	slw 0,7,10
+	slw 0,0,10
+	sraw 8,8,9
+	or 4,0,8
+	sraw 3,7,9
+	b L..1
+L..37:
+	lwz 10,0(6)
+	slwi 9,5,3
+	lwz 8,8(6)
+	lwz 0,4(6)
+	subfic 7,9,96
+	and 10,10,29
+	addi 9,9,-64
+	slw 6,0,9
+	sraw 8,8,7
+	slw 10,10,9
+	sraw 0,0,7
+	or 3,10,0
+	or 4,6,8
+	b L..1
 L..39:
-	lwz 3,0(9)
-	b L..1
-L..49:
-	lwz 9,76(31)
-	b L..39
-L..48:
-	lwz 9,76(31)
-	lhz 3,0(9)
-	b L..1
-L..47:
-	lwz 9,76(31)
-	lbz 3,0(9)
-	b L..1
-L..40:
 	lwz 3,64(31)
 	b L..1
-L..46:
+L..45:
 	lfd 1,64(31)
 	b L..1
-L..45:
+L..44:
 	lfs 1,64(31)
 	b L..1
-L..44:
+L..43:
 	lhz 3,64(31)
 	b L..1
-L..43:
+L..42:
 	lha 3,64(31)
 	b L..1
-L..41:
+L..40:
 	lbz 3,64(31)
 	b L..1
-L..42:
+L..41:
 	lbz 0,64(31)
 	slwi 0,0,24
 	srawi 3,0,24

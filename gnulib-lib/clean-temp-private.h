@@ -1,5 +1,5 @@
 /* Private interface between modules 'clean-temp-simple' and 'clean-temp'.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,6 @@
 #ifndef _CLEAN_TEMP_PRIVATE_H
 #define _CLEAN_TEMP_PRIVATE_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "gl_list.h"
 #include "asyncsafe-spin.h"

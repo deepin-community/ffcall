@@ -92,31 +92,76 @@ callback_receiver:
 	lwz 0,16(31)
 	andi. 9,0,1024
 	beq- 0,.L1
-	lwz 0,44(31)
-	cmpwi 0,0,1
-	beq- 0,.L47
-	cmpwi 0,0,2
-	beq- 0,.L48
-	cmpwi 0,0,4
-	beq- 0,.L49
-	cmpwi 0,0,8
-	bne+ 0,.L1
-	lwz 9,36(31)
-	lwz 4,4(9)
+	lwz 9,44(31)
+	addi 0,9,-1
+	cmplwi 0,0,7
+	bgt- 0,.L1
+	lwz 0,36(31)
+	cmplwi 0,9,4
+	rlwinm 8,0,0,30,31
+	rlwinm 5,0,0,0,29
+	add 6,8,9
+	bgt- 0,.L33
+	slwi 0,8,3
+	cmplwi 0,6,4
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 7,9,-1
+	bgt- 0,.L34
+	lwz 9,0(5)
+	slwi 0,6,3
+	subfic 0,0,32
+	and 9,9,7
+	sraw 3,9,0
+	b .L1
+.L34:
+	lwz 0,0(5)
+	slwi 9,6,3
+	lwz 10,4(5)
+	subfic 8,9,64
+	and 0,0,7
+	addi 9,9,-32
+	slw 0,0,9
+	sraw 10,10,8
 .L39:
-	lwz 3,0(9)
+	or 3,10,0
 	b .L1
-.L49:
-	lwz 9,36(31)
+.L33:
+	slwi 0,8,3
+	cmplwi 0,6,8
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 29,9,-1
+	bgt- 0,.L37
+	lwz 7,0(5)
+	slwi 10,6,2
+	addi 10,10,-16
+	lwz 8,4(5)
+	and 7,7,29
+	slwi 9,6,3
+	subfic 9,9,64
+	slw 0,7,10
+	slw 0,0,10
+	sraw 8,8,9
+	or 4,0,8
+	sraw 3,7,9
+	b .L1
+.L37:
+	slwi 9,6,3
+	lwz 0,4(5)
+	lwz 10,0(5)
+	subfic 6,9,96
+	lwz 8,8(5)
+	addi 9,9,-64
+	slw 7,0,9
+	and 10,10,29
+	sraw 8,8,6
+	slw 10,10,9
+	sraw 0,0,6
+	or 4,7,8
 	b .L39
-.L48:
-	lwz 9,36(31)
-	lhz 3,0(9)
-	b .L1
-.L47:
-	lwz 9,36(31)
-	lbz 3,0(9)
-	b .L1
 .L40:
 	lwz 3,24(31)
 	b .L1

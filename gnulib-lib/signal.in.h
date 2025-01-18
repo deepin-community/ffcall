@@ -1,6 +1,6 @@
 /* A GNU-like <signal.h>.
 
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -55,13 +55,26 @@
 #ifndef _@GUARD_PREFIX@_SIGNAL_H
 #define _@GUARD_PREFIX@_SIGNAL_H
 
-/* Mac OS X 10.3, FreeBSD 6.4, OpenBSD 3.8, OSF/1 4.0, Solaris 2.6, Android,
+/* This file uses GNULIB_POSIXCHECK, HAVE_RAW_DECL_*.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
+/* For testing the OpenBSD version.  */
+#if (@GNULIB_PTHREAD_SIGMASK@ || defined GNULIB_POSIXCHECK) \
+    && defined __OpenBSD__
+# include <sys/param.h>
+#endif
+
+/* Mac OS X 10.3, FreeBSD < 8.0, OpenBSD < 5.1, OSF/1 4.0, Solaris 2.6, Android,
    OS/2 kLIBC declare pthread_sigmask in <pthread.h>, not in <signal.h>.
    But avoid namespace pollution on glibc systems.*/
 #if (@GNULIB_PTHREAD_SIGMASK@ || defined GNULIB_POSIXCHECK) \
     && ((defined __APPLE__ && defined __MACH__) \
-        || defined __FreeBSD__ || defined __OpenBSD__ || defined __osf__ \
-        || defined __sun || defined __ANDROID__ || defined __KLIBC__) \
+        || (defined __FreeBSD__ && __FreeBSD__ < 8) \
+        || (defined __OpenBSD__ && OpenBSD < 201205) \
+        || defined __osf__ || defined __sun || defined __ANDROID__ \
+        || defined __KLIBC__) \
     && ! defined __GLIBC__
 # include <pthread.h>
 #endif
@@ -122,6 +135,47 @@ typedef void (*sighandler_t) (int);
 #ifndef NSIG
 # if defined __TANDEM
 #  define NSIG 32
+# endif
+#endif
+
+
+/* Maximum size of a signal name returned by sig2str(), including the
+   terminating NUL byte.  */
+#ifndef SIG2STR_MAX
+/* The longest one: "RTMAX", then "+" or "-", then up to 10 digits, then NUL.
+   Add + 2 as a reserve for the future.  */
+# define SIG2STR_MAX (5 + 1 + 10 + 1 + 2)
+#endif
+
+#if @GNULIB_SIG2STR@
+# if !@HAVE_SIG2STR@
+_GL_FUNCDECL_SYS (sig2str, int, (int signo, char *str));
+# endif
+_GL_CXXALIAS_SYS (sig2str, int, (int signo, char *str));
+# if __GLIBC__ >= 2
+_GL_CXXALIASWARN (sig2str);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef sig2str
+# if HAVE_RAW_DECL_SIG2STR
+_GL_WARN_ON_USE (sig2str, "sig2str is not portable - "
+                 "use gnulib module sig2str for portability");
+# endif
+#endif
+
+#if @GNULIB_SIG2STR@
+# if !@HAVE_STR2SIG@
+_GL_FUNCDECL_SYS (str2sig, int, (char const *str, int *signo_p));
+# endif
+_GL_CXXALIAS_SYS (str2sig, int, (char const *str, int *signo_p));
+# if __GLIBC__ >= 2
+_GL_CXXALIASWARN (str2sig);
+# endif
+#elif defined GNULIB_POSIXCHECK
+# undef str2sig
+# if HAVE_RAW_DECL_STR2SIG
+_GL_WARN_ON_USE (str2sig, "str2sig is not portable - "
+                 "use gnulib module sig2str for portability");
 # endif
 #endif
 
@@ -230,7 +284,7 @@ typedef int verify_NSIG_constraint[NSIG <= 32 ? 1 : -1];
 #   undef sigismember
 #  endif
 # else
-_GL_FUNCDECL_SYS (sigismember, int, (const sigset_t *set, int sig)
+_GL_FUNCDECL_SYS (sigismember, int, (const sigset_t *set, int sig),
                                     _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigismember, int, (const sigset_t *set, int sig));
@@ -243,7 +297,7 @@ _GL_CXXALIASWARN (sigismember);
 #   undef sigemptyset
 #  endif
 # else
-_GL_FUNCDECL_SYS (sigemptyset, int, (sigset_t *set) _GL_ARG_NONNULL ((1)));
+_GL_FUNCDECL_SYS (sigemptyset, int, (sigset_t *set), _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigemptyset, int, (sigset_t *set));
 _GL_CXXALIASWARN (sigemptyset);
@@ -255,7 +309,7 @@ _GL_CXXALIASWARN (sigemptyset);
 #   undef sigaddset
 #  endif
 # else
-_GL_FUNCDECL_SYS (sigaddset, int, (sigset_t *set, int sig)
+_GL_FUNCDECL_SYS (sigaddset, int, (sigset_t *set, int sig),
                                   _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigaddset, int, (sigset_t *set, int sig));
@@ -268,7 +322,7 @@ _GL_CXXALIASWARN (sigaddset);
 #   undef sigdelset
 #  endif
 # else
-_GL_FUNCDECL_SYS (sigdelset, int, (sigset_t *set, int sig)
+_GL_FUNCDECL_SYS (sigdelset, int, (sigset_t *set, int sig),
                                   _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigdelset, int, (sigset_t *set, int sig));
@@ -281,14 +335,14 @@ _GL_CXXALIASWARN (sigdelset);
 #   undef sigfillset
 #  endif
 # else
-_GL_FUNCDECL_SYS (sigfillset, int, (sigset_t *set) _GL_ARG_NONNULL ((1)));
+_GL_FUNCDECL_SYS (sigfillset, int, (sigset_t *set), _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigfillset, int, (sigset_t *set));
 _GL_CXXALIASWARN (sigfillset);
 
 /* Return the set of those blocked signals that are pending.  */
 # if !@HAVE_POSIX_SIGNALBLOCKING@
-_GL_FUNCDECL_SYS (sigpending, int, (sigset_t *set) _GL_ARG_NONNULL ((1)));
+_GL_FUNCDECL_SYS (sigpending, int, (sigset_t *set), _GL_ARG_NONNULL ((1)));
 # endif
 _GL_CXXALIAS_SYS (sigpending, int, (sigset_t *set));
 _GL_CXXALIASWARN (sigpending);

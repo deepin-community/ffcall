@@ -1,9 +1,9 @@
 	.file	"cache-powerpc.c"
 	.section	".text"
 	.align 2
-	.globl __TR_clear_cache
-	.type	__TR_clear_cache, @function
-__TR_clear_cache:
+	.globl __TR_clear_cache_2
+	.type	__TR_clear_cache_2, @function
+__TR_clear_cache_2:
 	.extern __mulh
 	.extern __mull
 	.extern __divss
@@ -25,7 +25,7 @@ __TR_clear_cache:
 	sync; isync
 	addi 1,1,32
 	blr
-	.size	__TR_clear_cache, .-__TR_clear_cache
+	.size	__TR_clear_cache_2, .-__TR_clear_cache_2
 #if defined __linux__ || defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __DragonFly__
 	.section .note.GNU-stack,"",@progbits
 #endif

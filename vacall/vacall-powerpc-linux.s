@@ -89,31 +89,76 @@ vacall_receiver:
 	lwz 0,16(31)
 	andi. 9,0,1024
 	beq- 0,.L1
-	lwz 0,44(31)
-	cmpwi 0,0,1
-	beq- 0,.L47
-	cmpwi 0,0,2
-	beq- 0,.L48
-	cmpwi 0,0,4
-	beq- 0,.L49
-	cmpwi 0,0,8
-	bne+ 0,.L1
-	lwz 9,36(31)
-	lwz 4,4(9)
+	lwz 9,44(31)
+	addi 0,9,-1
+	cmplwi 0,0,7
+	bgt- 0,.L1
+	lwz 0,36(31)
+	cmplwi 0,9,4
+	rlwinm 10,0,0,30,31
+	rlwinm 6,0,0,0,29
+	add 7,10,9
+	bgt- 0,.L33
+	slwi 0,10,3
+	cmplwi 0,7,4
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 8,9,-1
+	bgt- 0,.L34
+	lwz 9,0(6)
+	slwi 0,7,3
+	subfic 0,0,32
+	and 9,9,8
+	sraw 3,9,0
+	b .L1
+.L34:
+	lwz 0,0(6)
+	slwi 9,7,3
+	lwz 11,4(6)
+	subfic 10,9,64
+	and 0,0,8
+	addi 9,9,-32
+	slw 0,0,9
+	sraw 11,11,10
 .L39:
-	lwz 3,0(9)
+	or 3,11,0
 	b .L1
-.L49:
-	lwz 9,36(31)
+.L33:
+	slwi 0,10,3
+	cmplwi 0,7,8
+	subfic 0,0,31
+	li 9,2
+	slw 9,9,0
+	addi 5,9,-1
+	bgt- 0,.L37
+	lwz 8,0(6)
+	slwi 11,7,2
+	addi 11,11,-16
+	lwz 10,4(6)
+	and 8,8,5
+	slwi 9,7,3
+	subfic 9,9,64
+	slw 0,8,11
+	slw 0,0,11
+	sraw 10,10,9
+	or 4,0,10
+	sraw 3,8,9
+	b .L1
+.L37:
+	slwi 9,7,3
+	lwz 0,4(6)
+	lwz 11,0(6)
+	subfic 7,9,96
+	lwz 10,8(6)
+	addi 9,9,-64
+	slw 8,0,9
+	and 11,11,5
+	sraw 10,10,7
+	slw 11,11,9
+	sraw 0,0,7
+	or 4,8,10
 	b .L39
-.L48:
-	lwz 9,36(31)
-	lhz 3,0(9)
-	b .L1
-.L47:
-	lwz 9,36(31)
-	lbz 3,0(9)
-	b .L1
 .L40:
 	lwz 3,24(31)
 	b .L1

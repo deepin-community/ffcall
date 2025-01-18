@@ -5,9 +5,9 @@
 	.section	".text"
 	.align 2
 	.p2align 4,,15
-	.globl __TR_clear_cache
-	.type	__TR_clear_cache, @function
-__TR_clear_cache:
+	.globl __TR_clear_cache_2
+	.type	__TR_clear_cache_2, @function
+__TR_clear_cache_2:
  # 25 "cache-powerpc64.c" 1
 	icbi 0,3; dcbf 0,3
  # 0 "" 2
@@ -29,7 +29,7 @@ __TR_clear_cache:
 	blr
 	.long 0
 	.byte 0,0,0,0,0,0,0,0
-	.size	__TR_clear_cache,.-__TR_clear_cache
+	.size	__TR_clear_cache_2,.-__TR_clear_cache_2
 #if defined __linux__ || defined __FreeBSD__ || defined __FreeBSD_kernel__ || defined __DragonFly__
 	.section .note.GNU-stack,"",@progbits
 #endif

@@ -1,5 +1,5 @@
 #include "asm-x86_64.h"
-#if defined __OpenBSD__
+#if defined __OpenBSD__ || defined __HAIKU__
 	TEXT()
 	P2ALIGN(4,15)
 GLOBL(C(vacall_receiver))

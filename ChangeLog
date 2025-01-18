@@ -1,3 +1,564 @@
+2024-09-02  Bruno Haible  <bruno@clisp.org>
+
+	Prepare for 2.5 release.
+	* VERSION: Set to 2.5.
+	* NEWS: Update.
+
+2024-09-02  Bruno Haible  <bruno@clisp.org>
+
+	Bump shared library version numbers.
+	* Makefile.in (LIBFFCALL_VERSION_INFO): Bump to 1:1:1.
+	* avcall/Makefile.in (LIBAVCALL_VERSION_INFO): Bump to 2:1:1.
+	* trampoline/Makefile.in (LIBTRAMPOLINE_VERSION_INFO): Bump to 1:4:0.
+	* callback/Makefile.in (LIBCALLBACK_VERSION_INFO): Bump to 1:5:0.
+
+2024-09-02  Bruno Haible  <bruno@clisp.org>
+
+	build: Trim the code size of gnulib dependencies.
+	* gnulib-local/modules/libffcall-imports: New file.
+	* Makefile.maint (GNULIB_MODULES): Remove clean-temp-simple, hasmntopt,
+	lock, vma-prot. Add libffcall-imports.
+	(gnulib-m4/gnulib-cache.m4): Pass the options --local-dir and
+	--conditional-dependencies to gnulib-tool.
+
+2024-09-02  Bruno Haible  <bruno@clisp.org>
+
+	vacall: Fix build failure on Haiku (x86_64).
+	* vacall/Makefile.devel (vacall-x86_64-macro.S): On Haiku as well, use
+	the variant compiled with -fPIC. Needed because without -fPIC, the .text
+	section has a R_X86_64_PC32 relocation.
+
+2024-08-29  Bruno Haible  <bruno@clisp.org>
+
+	Avoid collision of different functions with the same name.
+	* trampoline/cache-powerpc.c (__TR_clear_cache_3): Renamed from
+	__TR_clear_cache.
+	* trampoline/cache-powerpc64.c (__TR_clear_cache_3): Renamed from
+	__TR_clear_cache.
+	* trampoline/trampoline.c: On powerpc*, use __TR_clear_cache_3 instead
+	of __TR_clear_cache.
+	* callback/trampoline_r/cache-powerpc.c (__TR_clear_cache_2): Renamed
+	from __TR_clear_cache.
+	* callback/trampoline_r/cache-powerpc64.c (__TR_clear_cache_2): Renamed
+	from __TR_clear_cache.
+	* callback/trampoline_r/trampoline.c: On powerpc*, use
+	__TR_clear_cache_2 instead of __TR_clear_cache.
+
+2024-08-29  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Drop support for K&R C compilers.
+	* trampoline/cache.c (__TR_clear_cache): Use ANSI C syntax.
+	* trampoline/trampoline.c (__TR_clear_cache_4, __TR_clear_cache):
+	Declare with parameters.
+	* callback/trampoline_r/trampoline.c (__TR_clear_cache_2,
+	__TR_clear_cache): Likewise.
+
+2024-08-29  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Simplify code structure.
+	* trampoline/trampoline.c (alloc_trampoline): Do the final mprotect call
+	before filling out the trampoline.
+	* callback/trampoline_r/trampoline.c (alloc_trampoline_r): Likewise.
+
+2024-08-29  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Fix test failure on OpenBSD/arm64.
+	* Makefile.maint (GNULIB_MODULES): Add vma-prot.
+	* trampoline/trampoline.c: Include vma-prot.h.
+	(is_trampoline): On OpenBSD, test first whether the function's code is
+	readable.
+	* callback/trampoline_r/trampoline.c: Include vma-prot.h.
+	(is_trampoline_r): On OpenBSD, test first whether the function's code is
+	readable.
+	* NEWS: Mention the improvement.
+
+2024-08-29  Bruno Haible  <bruno@clisp.org>
+
+	build: Verify the license of imported gnulib modules.
+	* Makefile.maint (gnulib-m4/gnulib-cache.m4): Pass option --gpl=2 to
+	gnulib-tool.
+
+2024-08-25  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Fix compilation error on Linux/hppa.
+	* trampoline/trampoline.c (alloc_trampoline, is_trampoline): Use
+	'volatile' to block an invalid GCC optimization.
+	* callback/trampoline_r/trampoline.c (alloc_trampoline_r,
+	is_trampoline_r): Likewise.
+	* NEWS: Mention it.
+
+2024-08-25  Bruno Haible  <bruno@clisp.org>
+
+	vacall: Fix build failure on Linux/hppa.
+	* vacall/Makefile.devel (vacall-hppa-linux-pic.s): New rule.
+	(vacall-hppa-macro.S): Combine the PIC and non-PIC code in a single
+	file.
+
+2024-08-25  Bruno Haible  <bruno@clisp.org>
+
+	A simpler fix for Linux/ia64.
+	* avcall/avcall-ia64.c (avcall_call): Revert last change. Use
+	__builtin_alloca to allocate the stack frame.
+
+2024-08-25  Bruno Haible  <bruno@clisp.org>
+
+	Fix the support for Linux/ia64.
+	In avcall, the l_l6J and l_l4K tests were failing.
+	* avcall/avcall-ia64.c (avcall_call): Remove argframe variable. Don't
+	make side effects on sp = r12. Instead, force the compiler to build a
+	stack frame for up to 256 arguments.
+	* NEWS: Mention the fix.
+
+2024-08-24  Bruno Haible  <bruno@clisp.org>
+
+	Fix shared library support in 32-bit mode on FreeBSD/powerpc64.
+	* libtool-patches/libtool-freebsd-biarch.diff: New file, from
+	<https://savannah.gnu.org/patch/index.php?10469>.
+	* libtool-patches/README: Mention it.
+	* Makefile.maint (libtool-imported-files): Apply it.
+
+2024-08-23  Bruno Haible  <bruno@clisp.org>
+
+	Add support for FreeBSD 14/powerpc64.
+	This is the first big-endian powerpc64-ELFv2 platform.
+	* avcall/avcall-powerpc64.c (avcall_call): Add big-endian variant of the
+	small-struct return handling code.
+	* vacall/vacall-powerpc64.c (vacall_receiver): Likewise.
+	* avcall/Makefile.devel (avcall-powerpc64-elfv2-linux.S): Include the
+	code for both little-endian and big-endian platforms.
+	* vacall/Makefile.devel (vacall-powerpc64-elfv2-linux.S): Likewise.
+	* callback/vacall_r/Makefile.devel (vacall-powerpc64-elfv2-linux.S):
+	Likewise.
+	* NEWS: Mention the new port.
+
+2024-08-23  Bruno Haible  <bruno@clisp.org>
+
+	Add support for FreeBSD 14/powerpc64le.
+	FreeBSD 14 breaks the long-standing convention that, on powerpc64,
+	_BIG_ENDIAN is defined on big-endian machines only and _LITTLE_ENDIAN
+	is defined on little-endian machines only.
+	* avcall/avcall-internal.h: On powerpc64, test __BIG_ENDIAN__ or
+	__LITTLE_ENDIAN__, not _BIG_ENDIAN or _LITTLE_ENDIAN, as FreeBSD 14
+	breaks the latter.
+	* vacall/vacall-internal.h: Likewise.
+	* NEWS: Mention the new port.
+
+2024-08-21  Bruno Haible  <bruno@clisp.org>
+
+	Add support for FreeBSD/powerpc and NetBSD/powerpc.
+	* avcall/avcall-powerpc.c (avcall_call): Add support for structs
+	returned in registers, of size 3, 5..7. Code copied from avcall-hppa.c.
+	* avcall/avcall-internal.h (__av_reg_struct_return): Define differently
+	for FreeBSD/powerpc and NetBSD/powerpc.
+	* avcall/avcall.h (__AV_STRUCT_RETURN): Include the
+	__AV_SMALL_STRUCT_RETURN flag on FreeBSD/powerpc and NetBSD/powerpc.
+	* vacall/vacall-powerpc.c (vacall_receiver): Add support for structs
+	returned in registers, of size 3, 5..7. Code copied from vacall-hppa.c.
+	* vacall/vacall-internal.h (__va_reg_struct_return): Define differently
+	for FreeBSD/powerpc and NetBSD/powerpc.
+	* vacall/vacall.h (__VA_STRUCT_RETURN): Include the
+	__VA_SMALL_STRUCT_RETURN flag on FreeBSD/powerpc and NetBSD/powerpc.
+	* callback/vacall_r/vacall_r.h: Likewise.
+	* NEWS: Mention the new ports.
+
+2024-08-21  Bruno Haible  <bruno@clisp.org>
+
+	Add support for Linux/riscv64 with musl libc.
+	* trampoline/trampoline.c (__riscv_flush_icache): New declaration.
+	* callback/trampoline_r/trampoline.c: Likewise.
+	* NEWS: Mention the new port.
+
+2024-08-20  Bruno Haible  <bruno@clisp.org>
+
+	Fix support for older Linux versions (regression 2024-08-18).
+	* trampoline/trampoline.c (is_usable_mount): Skip f_flags test if
+	'struct statfs' does not have this field.
+	* callback/trampoline_r/trampoline.c: Likewise.
+
+2024-08-20  Bruno Haible  <bruno@clisp.org>
+
+	Fix support for FreeBSD 12/arm, broken by last commit.
+	* m4/cc-gcc.m4 (CL_CC_GCC): Revert last change.
+	* cross-tools/cross.conf (arm): Add cross-compiler for
+	arm-linux-gnueabi.
+	* configure.ac: If HOST_CPU_C_ABI is arm or armhf, add a '-old' or
+	'-eabi' suffix.
+	* avcall/avcall-arm.c (avcall_call): With GCC >= 4, use __builtin_alloca
+	to reserve room for the stack frame.
+	* avcall/avcall-armhf.c (avcall_call): Remove redundant stack pointer
+	alignment.
+	* avcall/Makefile.devel (avcall-arm-old-macro.S): Renamed from
+	avcall-arm-macro.S.
+	(avcall-arm-eabi-macro.S): New rule.
+	(avcall-armhf-eabi-macro.S): Renamed from avcall-armhf-macro.S. Use
+	gcc 6.5 option -masm-syntax-unified.
+	* avcall/Makefile.in (avcall-arm-old.lo): Renamed from avcall-arm.lo.
+	(avcall-arm-old.s): Renamed from avcall-arm.s.
+	(avcall-arm-eabi.lo, avcall-arm-eabi.s): New rules.
+	(avcall-armhf-eabi.lo): Renamed from avcall-armhf.lo.
+	(avcall-armhf-eabi.s): Renamed from avcall-armhf.s.
+	(clean, SOURCE_FILES): Update.
+	* vacall/Makefile.devel (vacall-arm-old-linux.s): Renamed from
+	vacall-arm-linux.s.
+	(vacall-arm-old-linux-pic.s): Renamed from vacall-arm-linux-pic.s.
+	(vacall-arm-old-macro.S): Renamed from vacall-arm-macro.S.
+	(vacall-arm-eabi-linux.s, vacall-arm-eabi-linux-pic.s,
+	vacall-arm-eabi-macro.S): New rules.
+	(vacall-armhf-eabi-linux.s): Renamed from vacall-armhf-linux.s. Use
+	gcc 6.5 option -masm-syntax-unified.
+	(vacall-armhf-eabi-linux-pic.s): Renamed from vacall-armhf-linux-pic.s.
+	Use gcc 6.5 option -masm-syntax-unified.
+	(vacall-armhf-eabi-macro.S): Renamed from vacall-armhf-macro.S.
+	* vacall/Makefile.in (vacall-arm-old.@OBJEXT@): Renamed from
+	vacall-arm.@OBJEXT@.
+	(vacall-arm-old.s): Renamed from vacall-arm.s.
+	(vacall-arm-eabi.@OBJEXT@, vacall-arm-eabi.s): New rules.
+	(vacall-armhf-eabi.@OBJEXT@): Renamed from vacall-armhf.@OBJEXT@.
+	(vacall-armhf-eabi.s): Renamed from vacall-armhf.s.
+	(clean, SOURCE_FILES): Update.
+	* callback/vacall_r/Makefile.devel (vacall-arm-old-macro.S): Renamed
+	from vacall-arm-macro.S.
+	(vacall-arm-eabi-macro.S): New rule.
+	(vacall-armhf-eabi-macro.S): Renamed from vacall-armhf-macro.S. Use
+	gcc 6.5 option -masm-syntax-unified.
+	* callback/vacall_r/Makefile.in (vacall-arm-old.lo): Renamed from
+	vacall-arm.lo.
+	(vacall-arm-old.s): Renamed from vacall-arm.s.
+	(vacall-arm-eabi.lo, vacall-arm-eabi.s): New rules.
+	(vacall-armhf-eabi.lo): Renamed from vacall-armhf.lo.
+	(vacall-armhf-eabi.s): Renamed from vacall-armhf.s.
+	(clean, SOURCE_FILES): Update.
+
+	Add support for Android.
+	* m4/cc-gcc.m4 (CL_CC_GCC): If using clang as compiler, add the option
+	-no-integrated-as to GCC_X_NONE.
+	* NEWS: Mention Android as supported.
+
+2024-08-19  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Fix portability problems to Android API levels < 30.
+	* m4/codeexec.m4 (FFCALL_CODEEXEC): Test whether mmap()+mprotect works,
+	independently of the result of whether malloc()+mprotect works. Test
+	whether memfd_create exists at the given API level, before trying to use
+	it.
+	* trampoline/trampoline.c: On Android, prefer mmap()+mprotect to the
+	temp file location approach.
+	* callback/trampoline_r/trampoline.c: Likewise.
+
+2024-08-19  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Fix portability problems to Android API levels < 26.
+	* configure.ac: Test for setmntent.
+	* trampoline/trampoline.c: On Android, test HAVE_SETMNTENT, since
+	API levels < 21 don't have the necessary functions.
+	* callback/trampoline_r/trampoline.c: Likewise.
+	* Makefile.maint (GNULIB_MODULES): Add hasmntopt.
+
+2024-08-18  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Try harder to find a temp file location on Linux, OpenBSD.
+	Reported by Simon Dales <simon@getthingsfixed.co.uk> on 2018-02-26.
+	* trampoline/trampoline.c: Include <sys/statfs.h>, <sys/statvfs.h>,
+	<mntent.h> or <sys/mount.h>.
+	(is_usable_mount, is_usable_mntent, local_rwx_tmp_dir): New functions.
+	(for_mmap_init) [EXECUTABLE_VIA_MMAP_SHARED_POSIX]: Use
+	local_rwx_tmp_dir.
+	* callback/trampoline_r/trampoline.c: Likewise.
+
+2024-08-18  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Use anonymous memory also on NetBSD.
+	* m4/codeexec.m4 (FFCALL_CODEEXEC): Add a test that may define
+	HAVE_MMAP_SHARED_NETBSD_CAN_EXEC.
+	* trampoline/trampoline.c (EXECUTABLE_VIA_MMAP_SHARED_NETBSD): New
+	macro.
+	(alloc_trampoline): Add alternative code for
+	EXECUTABLE_VIA_MMAP_SHARED_NETBSD.
+	* callback/trampoline_r/trampoline.c: Likewise.
+	* NEWS: Mention the improvement.
+
+2024-08-18  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: More reliable autoconfiguration on Linux, FreeBSD, NetBSD.
+	* m4/codeexec.m4 (FFCALL_CODEEXEC): On Linux, FreeBSD, NetBSD, make the
+	results of HAVE_MPROTECT_AFTER_MALLOC_CAN_EXEC and
+	HAVE_MPROTECT_AFTER_MMAP_CAN_EXEC only dependent on the OS, independent
+	of configurable security policies.
+
+2024-08-17  Bruno Haible  <bruno@clisp.org>
+
+	trampoline: Work around failing mmap call on macOS 14,
+	and use memfd_create on Linux and FreeBSD.
+	Reported by Lorenzo Daneo <lorenzo.daneo91@gmail.com> at
+	<https://lists.gnu.org/archive/html/libffcall/2024-08/msg00007.html>.
+	* m4/codeexec.m4 (FFCALL_CODEEXEC): Rename HAVE_MMAP_SHARED_CAN_EXEC to
+	HAVE_MMAP_SHARED_POSIX_CAN_EXEC.
+	Add a test that may define HAVE_MMAP_SHARED_MACOS_CAN_EXEC.
+	Add a test that may define HAVE_MMAP_SHARED_MEMFD_CAN_EXEC.
+	* trampoline/trampoline.c: Test HAVE_MMAP_SHARED_POSIX_CAN_EXEC instead
+	of HAVE_MMAP_SHARED_CAN_EXEC.
+	(EXECUTABLE_VIA_MMAP_SHARED_POSIX): Renamed from
+	EXECUTABLE_VIA_MMAP_FILE_SHARED.
+	(EXECUTABLE_VIA_MMAP_SHARED_MACOS, EXECUTABLE_VIA_MMAP_SHARED_MEMFD):
+	New macros.
+	(mach_vm_remap) [EXECUTABLE_VIA_MMAP_SHARED_MACOS]: New declaration.
+	(for_mmap_init): Add an alternative implementation for
+	EXECUTABLE_VIA_MMAP_SHARED_MEMFD.
+	(alloc_trampoline): Add alternative code for
+	EXECUTABLE_VIA_MMAP_SHARED_MACOS.
+	* callback/trampoline_r/trampoline.c: Likewise.
+	* NEWS: Mention the improvements.
+
+2024-07-12  Bruno Haible  <bruno@clisp.org>
+
+	Switch to autoconf 2.72, automake 1.17.
+	* configure.ac: Remove AC_PROG_GCC_TRADITIONAL invocation.
+	* autogen.sh: Update comments.
+
+2024-04-04  Bruno Haible  <bruno@clisp.org>
+
+	Fix macro file 'serial' numbers for 'aclocal --install'.
+	* m4/endianness.m4: Make 'serial' effective.
+
+2023-09-18  Bruno Haible  <bruno@clisp.org>
+
+	Fix shared library support on Android.
+	* libtool-patches/libtool-android.diff: New file, from
+	<https://savannah.gnu.org/patch/index.php?10393>.
+	* libtool-patches/README: Mention it.
+	* Makefile.maint (libtool-imported-files): Apply it.
+
+2023-08-30  Bruno Haible  <bruno@clisp.org>
+
+	Recognize the *-*-windows* config triplets introduced on 2023-06-26.
+	* m4/codeexec.m4 (FFCALL_CODEEXEC): Treat windows* as equivalent to
+	mingw*.
+
+2023-06-29  Bruno Haible  <bruno@clisp.org>
+
+	Update the installation instructions for Windows.
+	* INSTALL.windows: Add a note about MSYS2.
+
+2023-05-21  Bruno Haible  <bruno@clisp.org>
+
+	Support creating shared libraries on Hurd/x86_64.
+	* libtool-patches/libtool-hurd-64.diff: New file, from
+	https://lists.gnu.org/archive/html/bug-hurd/2023-05/msg00086.html.
+	* libtool-patches/README: Mention it.
+	* Makefile.maint (libtool-imported-files): Apply it.
+
+2023-02-26  Bruno Haible  <bruno@clisp.org>
+
+	Modernize handling of m4 macro dirs.
+	Suggested by Sébastien Villemot <sebastien@debian.org>.
+	* configure.ac (AC_CONFIG_MACRO_DIRS): Specify the m4 macro dirs here.
+	* Makefile.maint (aclocal.m4): ... not here.
+	* autogen.sh: Update comments.
+
+2023-02-09  Bruno Haible  <bruno@clisp.org>
+
+	Fix compilation error with ISO C 23 compliant compilers.
+	Note: The parameter list (...) was introduced in C23, for compatibility
+	with C++. See ISO C 23 § 6.7.6.(1) definition of parameter-type-list and
+	<https://www.open-std.org/jtc1/sc22/wg14/www/docs/n2975.pdf>.
+	* trampoline/trampoline.h (trampoline_function_t): For ISO C23, use the
+	same syntax as for C++.
+	* callback/trampoline_r/trampoline_r.h (__TR_function): Likewise.
+	* callback/trampoline_r/test1.c (function): Likewise.
+	* callback/trampoline_r/test2.c (function): Likewise.
+	* callback/callback.h (callback_t): Likewise.
+
+2022-07-18  Bruno Haible  <bruno@clisp.org>
+
+	Make autopull.sh more suited for continuous integration.
+	* autopull.sh: Support option --one-time.
+
+2022-07-18  Bruno Haible  <bruno@clisp.org>
+
+	Move gnulib-tool invocation back from autopull.sh to autogen.sh.
+	* autogen.sh: Revert last change regarding gnulib. Improve comments.
+	* autopull.sh: Only call 'gitsub.sh pull' and fetch libtool.
+
+2022-07-17  Bruno Haible  <bruno@clisp.org>
+
+	Split autogen.sh into autopull.sh and autogen.sh.
+	* autopull.sh: New file, based on autogen.sh.
+	* autogen.sh: Remove code that was moved to autopull.sh. Remove
+	--skip-gnulib option.
+	* Makefile.in (SOURCE_FILES): Add README-hacking, autogen.sh.
+	* README-hacking: Mention autopull.sh.
+
+2022-05-22  Bruno Haible  <bruno@clisp.org>
+
+	Add GNU Project notice.
+	* JOIN-GNU: New file. Inspired by a suggestion from José E. Marchesi
+	on the gnu-prog-discuss mailing list.
+	* README: Refer to it.
+	* Makefile.in (SOURCE_FILES): Add it.
+
+2022-05-15  Bruno Haible  <bruno@clisp.org>
+
+	Switch to libtool 2.4.7.
+	* autogen.sh (LIBTOOL_VERSION): Set to 2.4.7.
+	* libtool-patches/libtool-midnightbsd-fix.diff: Remove file.
+	* libtool-patches/README: Don't mention it.
+	* Makefile.maint (libtool-imported-files): Don't apply it.
+
+2022-05-08  Bruno Haible  <bruno@clisp.org>
+
+	loongarch: Use the now-released GCC 12.
+	* cross-tools/cross-build.sh: Fix typo in comment.
+	(func_build_zstd): New function.
+	(func_build_gcc): For GCC versions ≥ 12, build also zstd.
+	* cross-tools/patches/gcc-12.1.0.patch: New file.
+	* cross-tools/cross.conf (loongarch64): Use GCC 12.1.0.
+	* avcall/Makefile.devel (avcall-loongarch64-linux.s): Force the use of
+	GCC 12.1.0.
+	* vacall/Makefile.devel (vacall-loongarch64-linux.s): Likewise.
+	* callback/vacall_r/Makefile.devel (vacall-loongarch64-linux.s):
+	Likewise.
+	* trampoline/Makefile.devel (proto-loongarch64.s): Likewise.
+	* callback/trampoline_r/Makefile.devel (proto-loongarch64.s): Likewise.
+	* trampoline/proto-loongarch64.s: Regenerated.
+	* callback/trampoline_r/proto-loongarch64.s: Regenerated.
+
+2022-05-08  Bruno Haible  <bruno@clisp.org>
+
+	riscv32: Add support for Linux/riscv32 with PIE-enabled GCC.
+	* vacall/Makefile.devel (vacall-riscv32-ilp32d-linux-pic.s): New target.
+	(vacall-riscv32-ilp32d-macro.S): Include code for the PIC and the
+	non-PIC case.
+	* vacall/Makefile.in (SOURCE_FILES): Add
+	vacall-riscv32-ilp32d-linux-pic.s.
+
+2022-05-08  Bruno Haible  <bruno@clisp.org>
+
+	riscv64: Add support for Linux/riscv64 with PIE-enabled GCC.
+	Reported by Raymond Wong <infiwang@pm.me> at
+	<https://savannah.gnu.org/bugs/?62422>.
+	* vacall/Makefile.devel (vacall-riscv64-lp64d-linux-pic.s): New target.
+	(vacall-riscv64-lp64d-macro.S): Include code for the PIC and the non-PIC
+	case.
+	* vacall/Makefile.in (SOURCE_FILES): Add
+	vacall-riscv64-lp64d-linux-pic.s.
+
+2022-02-12  Bruno Haible  <bruno@clisp.org>
+
+	loongarch: Fix gcc installation.
+	* cross-tools/cross.conf (loongarch64): Change gcc version to match what
+	it actually reports.
+
+2022-02-12  Bruno Haible  <bruno@clisp.org>
+
+	Fix cross-tools build.
+	* cross-tools/cross-build.sh (func_build_gcc): Set LD_LIBRARY_PATH, so
+	that libisl.so.15 gets found during installation.
+
+2022-02-12  Bruno Haible  <bruno@clisp.org>
+
+	loongarch: Allow for continuous integration.
+	* cross-tools/cross-build.sh (func_build_gcc): Download fork tarball
+	from alpha.gnu.org. Adjust installation completeness test.
+	* cross-tools/cross.conf (loongarch64): Use binutils 2.38.
+
+2022-01-16  Bruno Haible  <bruno@clisp.org>
+
+	loongarch: Add support for loongarch64 ABI.
+	* cross-tools/cross-build.sh (func_build_binutils): Add support for
+	newer binutils snapshots.
+	(func_build_gcc): Add support for GCC 10 and newer.
+	* cross-tools/cross.conf: Add configuration for loongarch64 cross tools.
+	* porting-tools/abis/call-used-registers.txt: Add info about
+	loongarch64.
+	* porting-tools/abis/reg-struct-return.txt: Likewise.
+	* porting-tools/abis/stack-frame.txt: Likewise. Some more tweaks.
+	* porting-tools/execstack/voidfunc.c: Add command for loongarch64.
+	* porting-tools/execstack/voidfunc-loongarch64.o: New generated file.
+	* porting-tools/execstack/main.c (voidfunc): Define also for loongarch.
+	* porting-tools/execstack/README: Add info about loongarch64.
+	* ffcall-abi.h: Add support for loongarch64-lp64.
+	* common/asm-loongarch.sh: New file.
+	* Makefile.in (SOURCE_FILES): Add it.
+	* avcall/avcall.h (__AV_STRUCT_RETURN, __AV_REGISTER_STRUCT_RETURN): Add
+	code for __loongarch64__.
+	* avcall/avcall-alist.h (__av_alist): Likewise.
+	* avcall/avcall-internal.h: Add code for __loongarch64__, especially
+	__av_start1, __av_reg_struct_return, __av_start_struct4, __av_word,
+	__av_long, __av_ulong, __av_ptr, __av_longlong, __av_ulonglong,
+	_av_float, _av_double, __av_struct.
+	* avcall/avcall-loongarch64.c: New file, based on
+	avcall/avcall-riscv64.c.
+	* avcall/Makefile.devel (avcall-loongarch64-linux.s,
+	avcall-loongarch64-macro.S): New targets.
+	* avcall/Makefile.in (avcall-loongarch64.lo, avcall-loongarch64.s): New
+	targets.
+	(clean): Remove avcall-loongarch64.s.
+	(SOURCE_FILES): Add avcall-loongarch64.c, avcall-loongarch64-linux.s,
+	avcall-loongarch64-macro.S.
+	* vacall/vacall.h (__VA_STRUCT_RETURN, __VA_REGISTER_STRUCT_RETURN): Add
+	code for __loongarch64__.
+	* vacall/vacall-internal.h: Add code for __loongarch64__, especially
+	__va_alist, __va_reg_struct_return, __va_start_struct2,
+	__va_arg_leftadjusted, __va_arg_adjusted, _va_arg_longlong,
+	_va_arg_ulonglong, __va_align_double, _va_arg_float, _va_arg_double,
+	__va_arg_struct, _va_return_longlong.
+	* vacall/vacall-loongarch64.c: New file, based on
+	vacall/vacall-riscv64.c.
+	* vacall/Makefile.devel (vacall-loongarch64-linux.s,
+	vacall-loongarch64-macro.S): New targets.
+	* vacall/Makefile.in (vacall-loongarch64.@OBJEXT@,
+	vacall-loongarch64.s): New targets.
+	(clean): Remove vacall-loongarch64.s.
+	(SOURCE_FILES): Add vacall-loongarch64.c, vacall-loongarch64-linux.s,
+	vacall-loongarch64-macro.S.
+	* callback/vacall_r/vacall_r.h (__VA_STRUCT_RETURN,
+	__VA_REGISTER_STRUCT_RETURN): Add code for __loongarch64__.
+	* callback/vacall_r/Makefile.devel (vacall-loongarch64-linux.s,
+	vacall-loongarch64-macro.S): New targets.
+	* callback/vacall_r/Makefile.in (vacall-loongarch64.lo,
+	vacall-loongarch64.s): New targets.
+	(clean): Remove vacall-loongarch64.s.
+	(SOURCE_FILES): Add vacall-loongarch64-linux.s,
+	vacall-loongarch64-macro.S.
+	* trampoline/Makefile.devel (proto-loongarch64.s, tramp-loongarch64.o):
+	New targets.
+	* trampoline/proto-loongarch64.s: New generated file.
+	* trampoline/tramp-loongarch64.s: New file.
+	* trampoline/tramp-loongarch64.o: New generated file.
+	* trampoline/trampoline.c: Implement for __loongarch64__.
+	* callback/trampoline_r/Makefile.devel (proto-loongarch64.s,
+	tramp-loongarch64.o): New targets.
+	* callback/trampoline_r/proto64.c: Add code for __loongarch64__.
+	* callback/trampoline_r/proto-loongarch64.s: New generated file.
+	* callback/trampoline_r/tramp-loongarch64.s: New file.
+	* callback/trampoline_r/tramp-loongarch64.o: New generated file.
+	* callback/trampoline_r/trampoline.c: Implement for __loongarch64__.
+	* callback/trampoline_r/test1.c: Add support for __loongarch64__.
+	* PLATFORMS, */PLATFORMS: List the 64-bit LoongArch ABI.
+	* NEWS: Mention the new port.
+
+2022-01-16  Bruno Haible  <bruno@clisp.org>
+
+	Simplify.
+	* callback/vacall_r/Makefile.in (vacall-alpha.s, vacall-powerpc.s,
+	vacall-s390.lo, vacall-s390x.s, vacall-riscv32-ilp32d.s,
+	vacall-riscv64-lp64d.s): Don't use -I options during preprocessing.
+
+2021-06-26  Bruno Haible  <bruno@clisp.org>
+
+	x86_64: Create a read-only .eh_frame section on all platforms.
+	Reported by Thomas Klausner <tk@giga.or.at> at
+	<https://savannah.gnu.org/bugs/?60815>.
+	* common/asm-x86_64.h (EH_FRAME_SECTION): Use flags "a" (instead of
+	"aw") on all platforms.
+
+2021-06-13  Bruno Haible  <bruno@clisp.org>
+
+	maint: Don't require an internet connection for running autogen.sh.
+	* libtool-patches: New directory.
+	* Makefile.maint (libtool-imported-files): Don't call wget. Take the
+	patches from libtool-patches/ instead.
+
 2021-06-13  Bruno Haible  <bruno@clisp.org>
 
 	Prepare for 2.4 release.

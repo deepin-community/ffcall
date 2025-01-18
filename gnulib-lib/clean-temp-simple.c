@@ -1,5 +1,5 @@
 /* Temporary files with automatic cleanup.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2024 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -24,15 +24,15 @@
 #include <errno.h>
 #include <limits.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "error.h"
+#include <error.h>
 #include "fatal-signal.h"
 #include "asyncsafe-spin.h"
 #include "glthread/lock.h"
+#include "glthread/once.h"
 #include "thread-optim.h"
 #include "gl_list.h"
 #include "gl_linkedhash_list.h"
@@ -184,7 +184,7 @@ clean_temp_init_asyncsafe_close (void)
 
 /* The signal handler.  It gets called asynchronously.  */
 static _GL_ASYNC_SAFE void
-cleanup_action (int sig _GL_UNUSED)
+cleanup_action (_GL_UNUSED int sig)
 {
   size_t i;
 

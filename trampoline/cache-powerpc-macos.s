@@ -1,7 +1,7 @@
 .text
 	.align 2
-	.globl ___TR_clear_cache
-___TR_clear_cache:
+	.globl ___TR_clear_cache_3
+___TR_clear_cache_3:
 	icbi 0,r3; dcbf 0,r3
 	addi r0,r3,4
 	icbi 0,r0; dcbf 0,r0

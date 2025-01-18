@@ -13,30 +13,30 @@ avcall_call:
 	adds r20 = 48, r32
 	.mmi
 	adds r16 = 64, r32
+	.vframe r36
+	mov r36 = r12
 	adds r21 = 72, r32
-	adds r19 = -2032, r12
 	;;
 	.mmb
 	ld8 r15 = [r14]
 	ld8 r17 = [r20]
 	nop 0
 	.mii
-	.vframe r36
-	mov r36 = r12
+	adds r12 = -2064, r12
 	.save ar.lc, r38
 	mov r38 = ar.lc
 	mov r37 = r1
 	;;
-	.mmi
+	.mmb
 	sub r15 = r15, r17
 	ld8 r14 = [r16]
+	nop 0
+	.mii
+	adds r19 = 16, r12
 	.save rp, r34
 	mov r34 = b0
 	.body
-	.mmi
-	nop 0
 	;;
-	nop 0
 	shr.u r15 = r15, 3
 	.mmi
 	sub r14 = r14, r21

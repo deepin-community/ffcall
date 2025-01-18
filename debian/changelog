@@ -1,16 +1,21 @@
-ffcall (2.4-2.1deepin1) unstable; urgency=medium
+ffcall (2.5-2) unstable; urgency=medium
 
-  * Add loong64 support.
+  * Worked fine in experimental, uploading to unstable.
 
- -- xiangzelong <xiangzelong@deepin.org>  Thu, 05 Sep 2024 16:29:20 +0800
+ -- Peter Van Eynde <pvaneynd@debian.org>  Fri, 22 Nov 2024 07:39:15 +0100
 
-ffcall (2.4-2.1) unstable; urgency=medium
+ffcall (2.5-1) experimental; urgency=medium
 
-  * Non-maintainer upload.
-  * fix ftbfs on riscv64 and this is rdep of clisp which to bootstrap sbcl on
-    riscv64. (Closes: #1038803)
+  [ Sébastien Villemot ]
+  * Remove myself from Uploaders
 
- -- Bo YU <tsu.yubo@gmail.com>  Wed, 21 Jun 2023 06:07:35 +0800
+  [ Peter Van Eynde ]
+  * New upstream version 2.5. (Closes: 883044, 1058649)
+  * Removed integrated m4-dirs patch
+  * Added myself as uploader
+  * Updated Standards-Version, no changes
+
+ -- Peter Van Eynde <pvaneynd@debian.org>  Wed, 20 Nov 2024 08:09:29 +0100
 
 ffcall (2.4-2) unstable; urgency=medium
 

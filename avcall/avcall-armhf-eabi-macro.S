@@ -42,7 +42,7 @@ L(6):
 	ldr	r3, [r4, $48]
 	tst	r3, $1
 	beq	L(4)
-// 87 "avcall-armhf.c" 1
+// 89 "avcall-armhf.c" 1
 	vldr.32 s0,[r4, $56]
 // 0 "" 2
 	.arm
@@ -50,7 +50,7 @@ L(6):
 L(4):
 	tst	r3, $2
 	beq	L(7)
-// 89 "avcall-armhf.c" 1
+// 91 "avcall-armhf.c" 1
 	vldr.32 s1,[r4, $60]
 // 0 "" 2
 	.arm
@@ -58,7 +58,7 @@ L(4):
 L(7):
 	tst	r3, $4
 	beq	L(8)
-// 91 "avcall-armhf.c" 1
+// 93 "avcall-armhf.c" 1
 	vldr.32 s2,[r4, $64]
 // 0 "" 2
 	.arm
@@ -66,7 +66,7 @@ L(7):
 L(8):
 	tst	r3, $8
 	beq	L(9)
-// 93 "avcall-armhf.c" 1
+// 95 "avcall-armhf.c" 1
 	vldr.32 s3,[r4, $68]
 // 0 "" 2
 	.arm
@@ -74,7 +74,7 @@ L(8):
 L(9):
 	tst	r3, $16
 	beq	L(10)
-// 95 "avcall-armhf.c" 1
+// 97 "avcall-armhf.c" 1
 	vldr.32 s4,[r4, $72]
 // 0 "" 2
 	.arm
@@ -82,7 +82,7 @@ L(9):
 L(10):
 	tst	r3, $32
 	beq	L(11)
-// 97 "avcall-armhf.c" 1
+// 99 "avcall-armhf.c" 1
 	vldr.32 s5,[r4, $76]
 // 0 "" 2
 	.arm
@@ -90,7 +90,7 @@ L(10):
 L(11):
 	tst	r3, $64
 	beq	L(12)
-// 99 "avcall-armhf.c" 1
+// 101 "avcall-armhf.c" 1
 	vldr.32 s6,[r4, $80]
 // 0 "" 2
 	.arm
@@ -98,7 +98,7 @@ L(11):
 L(12):
 	tst	r3, $128
 	beq	L(13)
-// 101 "avcall-armhf.c" 1
+// 103 "avcall-armhf.c" 1
 	vldr.32 s7,[r4, $84]
 // 0 "" 2
 	.arm
@@ -106,7 +106,7 @@ L(12):
 L(13):
 	tst	r3, $256
 	beq	L(14)
-// 103 "avcall-armhf.c" 1
+// 105 "avcall-armhf.c" 1
 	vldr.32 s8,[r4, $88]
 // 0 "" 2
 	.arm
@@ -114,7 +114,7 @@ L(13):
 L(14):
 	tst	r3, $512
 	beq	L(15)
-// 105 "avcall-armhf.c" 1
+// 107 "avcall-armhf.c" 1
 	vldr.32 s9,[r4, $92]
 // 0 "" 2
 	.arm
@@ -122,7 +122,7 @@ L(14):
 L(15):
 	tst	r3, $1024
 	beq	L(16)
-// 107 "avcall-armhf.c" 1
+// 109 "avcall-armhf.c" 1
 	vldr.32 s10,[r4, $96]
 // 0 "" 2
 	.arm
@@ -130,7 +130,7 @@ L(15):
 L(16):
 	tst	r3, $2048
 	beq	L(17)
-// 109 "avcall-armhf.c" 1
+// 111 "avcall-armhf.c" 1
 	vldr.32 s11,[r4, $100]
 // 0 "" 2
 	.arm
@@ -138,7 +138,7 @@ L(16):
 L(17):
 	tst	r3, $4096
 	beq	L(18)
-// 111 "avcall-armhf.c" 1
+// 113 "avcall-armhf.c" 1
 	vldr.32 s12,[r4, $104]
 // 0 "" 2
 	.arm
@@ -146,7 +146,7 @@ L(17):
 L(18):
 	tst	r3, $8192
 	beq	L(19)
-// 113 "avcall-armhf.c" 1
+// 115 "avcall-armhf.c" 1
 	vldr.32 s13,[r4, $108]
 // 0 "" 2
 	.arm
@@ -154,7 +154,7 @@ L(18):
 L(19):
 	tst	r3, $16384
 	beq	L(20)
-// 115 "avcall-armhf.c" 1
+// 117 "avcall-armhf.c" 1
 	vldr.32 s14,[r4, $112]
 // 0 "" 2
 	.arm
@@ -162,7 +162,7 @@ L(19):
 L(20):
 	tst	r3, $32768
 	beq	L(21)
-// 117 "avcall-armhf.c" 1
+// 119 "avcall-armhf.c" 1
 	vldr.32 s15,[r4, $116]
 // 0 "" 2
 	.arm
@@ -171,7 +171,7 @@ L(21):
 	ldr	r3, [r4, $52]
 	tst	r3, $1
 	beq	L(22)
-// 121 "avcall-armhf.c" 1
+// 123 "avcall-armhf.c" 1
 	vldr.64 d0,[r4, $120]
 // 0 "" 2
 	.arm
@@ -179,7 +179,7 @@ L(21):
 L(22):
 	tst	r3, $2
 	beq	L(23)
-// 123 "avcall-armhf.c" 1
+// 125 "avcall-armhf.c" 1
 	vldr.64 d1,[r4, $128]
 // 0 "" 2
 	.arm
@@ -187,7 +187,7 @@ L(22):
 L(23):
 	tst	r3, $4
 	beq	L(24)
-// 125 "avcall-armhf.c" 1
+// 127 "avcall-armhf.c" 1
 	vldr.64 d2,[r4, $136]
 // 0 "" 2
 	.arm
@@ -195,7 +195,7 @@ L(23):
 L(24):
 	tst	r3, $8
 	beq	L(25)
-// 127 "avcall-armhf.c" 1
+// 129 "avcall-armhf.c" 1
 	vldr.64 d3,[r4, $144]
 // 0 "" 2
 	.arm
@@ -203,7 +203,7 @@ L(24):
 L(25):
 	tst	r3, $16
 	beq	L(26)
-// 129 "avcall-armhf.c" 1
+// 131 "avcall-armhf.c" 1
 	vldr.64 d4,[r4, $152]
 // 0 "" 2
 	.arm
@@ -211,7 +211,7 @@ L(25):
 L(26):
 	tst	r3, $32
 	beq	L(27)
-// 131 "avcall-armhf.c" 1
+// 133 "avcall-armhf.c" 1
 	vldr.64 d5,[r4, $160]
 // 0 "" 2
 	.arm
@@ -219,7 +219,7 @@ L(26):
 L(27):
 	tst	r3, $64
 	beq	L(28)
-// 133 "avcall-armhf.c" 1
+// 135 "avcall-armhf.c" 1
 	vldr.64 d6,[r4, $168]
 // 0 "" 2
 	.arm
@@ -227,7 +227,7 @@ L(27):
 L(28):
 	tst	r3, $128
 	beq	L(29)
-// 135 "avcall-armhf.c" 1
+// 137 "avcall-armhf.c" 1
 	vldr.64 d7,[r4, $176]
 // 0 "" 2
 	.arm

@@ -5,9 +5,9 @@
 	.section	".text"
 	.align 2
 	.p2align 4,,15
-	.globl __TR_clear_cache
-	.type	__TR_clear_cache, @function
-__TR_clear_cache:
+	.globl __TR_clear_cache_3
+	.type	__TR_clear_cache_3, @function
+__TR_clear_cache_3:
 #APP
  # 25 "cache-powerpc64.c" 1
 	icbi 0,3; dcbf 0,3
@@ -49,6 +49,6 @@ __TR_clear_cache:
 	blr
 	.long 0
 	.byte 0,0,0,0,0,0,0,0
-	.size	__TR_clear_cache,.-__TR_clear_cache
+	.size	__TR_clear_cache_3,.-__TR_clear_cache_3
 	.ident	"GCC: (GNU) 5.4.0"
 	.section	.note.GNU-stack,"",@progbits

@@ -1,6 +1,6 @@
 /**
   Copyright 1993 Bill Triggs <Bill.Triggs@inrialpes.fr>
-  Copyright 1995-2021 Bruno Haible <bruno@clisp.org>
+  Copyright 1995-2024 Bruno Haible <bruno@clisp.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -56,30 +56,32 @@
   ----------------------------------------------------------------------*/
 #include "avcall-internal.h"
 
-#define RETURN(TYPE,VAL)	(*(TYPE*)l->raddr = (TYPE)(VAL))
+#define RETURN(TYPE,VAL)        (*(TYPE*)l->raddr = (TYPE)(VAL))
 
 int
 avcall_call(av_alist* list)
 {
-  register unsigned long sp	__asm__("r13");  /* C names for registers */
-/*register __avrword	iret	__asm__("r0"); */
-  register __avrword	iret2	__asm__("r1");
-  register float	fret	__asm__("s0");
-  register double	dret	__asm__("d0");
+  register unsigned long sp     __asm__("r13");  /* C names for registers */
+/*register __avrword    iret    __asm__("r0"); */
+  register __avrword    iret2   __asm__("r1");
+  register float        fret    __asm__("s0");
+  register double       dret    __asm__("d0");
 
   __av_alist* l = &AV_LIST_INNER(list);
 
   __avword* argframe = __builtin_alloca(__AV_ALIST_WORDS * sizeof(__avword)); /* make room for argument list */
 
+#if __GNUC__ < 4
   /* Enforce 8-bytes-alignment of the stack pointer.
      We need to do it this way because the old GCC that we use to compile
      this file does not support the option '-mabi=aapcs'. */
   sp &= -8;
+#endif
 
   int arglen = l->aptr - l->args;
   __avrword i;
 
-  for (i = 4; i < arglen; i++)		/* push function args onto stack */
+  for (i = 4; i < arglen; i++)          /* push function args onto stack */
     argframe[i-4] = l->args[i];
 
   /* load float values into floating-point registers */
@@ -134,7 +136,7 @@ avcall_call(av_alist* list)
   if ((l->darg_mask >> 7) & 1)
     __asm__ __volatile__ ("vldr.64 d7,%0" : : "m" (l->dargs[7]));
 
-				/* call function, pass 4 integer args in registers */
+                                /* call function, pass 4 integer args in registers */
   i = (*l->func)(l->args[0], l->args[1], l->args[2], l->args[3]);
 
   /* save return value */
