@@ -7,22 +7,22 @@ _avcall_call:
 	stw r0,8(r1)
 	mr r29,r3
 	stwu r1,-1104(r1)
-	li r3,8
-	lwz r0,20(r29)
+	li r11,8
+	lwz r0,20(r3)
 	mr r30,r1
-	lwz r9,24(r29)
-	addi r10,r1,56
-	subf r0,r9,r0
-	srawi r11,r0,2
-	cmpw cr0,r3,r11
+	lwz r3,24(r3)
+	addi r8,r1,56
+	subf r0,r3,r0
+	srawi r10,r0,2
+	cmpw cr0,r11,r10
 	bge- cr0,L87
-	mr r12,r9
+	mr r12,r3
 L6:
-	slwi r9,r3,2
-	addi r3,r3,1
-	cmpw cr0,r3,r11
+	slwi r9,r11,2
+	addi r11,r11,1
+	cmpw cr0,r11,r10
 	lwzx r0,r9,r12
-	add r9,r9,r10
+	add r9,r9,r8
 	stw r0,-32(r9)
 	blt+ cr0,L6
 L86:
@@ -107,24 +107,20 @@ L8:
 	cmpwi cr0,r9,6
 	beq- cr0,L89
 	cmpwi cr0,r9,7
-	beq- cr0,L96
+	beq- cr0,L91
 	cmpwi cr0,r9,8
-	beq- cr0,L96
+	beq- cr0,L91
 	cmpwi cr0,r9,9
-	beq- cr0,L96
+	beq- cr0,L91
 	cmpwi cr0,r9,10
-	beq- cr0,L96
+	beq- cr0,L91
 	addi r0,r9,-11
 	cmplwi cr0,r0,1
-	ble- cr0,L95
-	cmpwi cr0,r9,13
-	beq- cr0,L97
-	cmpwi cr0,r9,14
-	beq- cr0,L98
-	cmpwi cr0,r9,15
-	beq- cr0,L96
-	cmpwi cr0,r9,16
-	beq- cr0,L99
+	bgt- cr0,L68
+	lwz r9,8(r29)
+	stw r4,4(r9)
+L88:
+	stw r3,0(r9)
 L49:
 	lwz r1,0(r1)
 	li r3,0
@@ -132,28 +128,134 @@ L49:
 	lmw r29,-12(r1)
 	mtlr r0
 	blr
-L99:
+L68:
+	cmpwi cr0,r9,13
+	beq- cr0,L92
+	cmpwi cr0,r9,14
+	beq- cr0,L93
+	cmpwi cr0,r9,15
+	beq- cr0,L91
+	cmpwi cr0,r9,16
+	bne+ cr0,L49
 	lwz r0,0(r29)
 	andi. r9,r0,512
 	beq- cr0,L49
-	lwz r0,16(r29)
-	cmpwi cr0,r0,1
-	beq- cr0,L90
-	cmpwi cr0,r0,2
-	beq- cr0,L89
-	cmpwi cr0,r0,4
-	beq- cr0,L96
-	cmpwi cr0,r0,8
-	bne+ cr0,L49
-L95:
-	lwz r9,8(r29)
-	stw r4,4(r9)
-L88:
-	stw r3,0(r9)
+	lwz r8,16(r29)
+	addi r0,r8,-1
+	cmplwi cr0,r0,7
+	bgt- cr0,L49
+	lwz r0,8(r29)
+	cmplwi cr0,r8,4
+	rlwinm r9,r0,0,30,31
+	rlwinm r5,r0,0,0,29
+	add r8,r9,r8
+	bgt- cr0,L79
+	cmplwi cr0,r8,4
+	bgt- cr0,L80
+	slwi r0,r9,3
+	slwi r10,r8,3
+	subfic r0,r0,31
+	li r11,2
+	lwz r8,0(r5)
+	subfic r10,r10,32
+	slw r11,r11,r0
+	slw r9,r3,r10
+	li r0,1
+	xor r9,r8,r9
+	slw r0,r0,r10
+	subf r11,r0,r11
+	and r9,r9,r11
+	xor r8,r8,r9
+	stw r8,0(r5)
 	b L49
-L96:
+L80:
+	slwi r8,r8,3
+	slwi r9,r9,3
+	lwz r6,0(r5)
+	subfic r9,r9,31
+	lwz r7,4(r5)
+	addi r0,r8,-32
+	li r11,2
+	subfic r8,r8,64
+	slw r11,r11,r9
+	slw r10,r3,r8
+	sraw r0,r3,r0
+	li r9,-1
+	xor r0,r6,r0
+	xor r10,r7,r10
+	addi r11,r11,-1
+	slw r9,r9,r8
+	and r0,r0,r11
+	and r10,r10,r9
+	xor r6,r6,r0
+	xor r7,r7,r10
+	stw r7,4(r5)
+	stw r6,0(r5)
+	b L49
+L79:
+	slwi r0,r9,3
+	cmplwi cr0,r8,8
+	subfic r0,r0,31
+	li r9,2
+	slw r9,r9,r0
+	addi r29,r9,-1
+	bgt- cr0,L83
+	slwi r9,r8,2
+	slwi r10,r8,3
+	addi r9,r9,-16
+	subfic r10,r10,64
+	sraw r11,r4,r9
+	lwz r8,0(r5)
+	lwz r7,4(r5)
+	sraw r11,r11,r9
+	slw r0,r3,r10
+	slw r4,r4,r10
+	or r0,r0,r11
+	li r9,-1
+	xor r0,r8,r0
+	xor r4,r7,r4
+	slw r9,r9,r10
+	and r0,r0,r29
+	and r4,r4,r9
+	xor r8,r8,r0
+	xor r7,r7,r4
+	stw r8,0(r5)
+	stw r7,4(r5)
+	b L49
+L83:
+	slwi r9,r8,3
+	lwz r7,0(r5)
+	addi r6,r9,-64
+	lwz r8,8(r5)
+	subfic r9,r9,96
+	sraw r11,r3,r6
+	slw r10,r4,r9
+	li r0,-1
+	slw r0,r0,r9
+	xor r11,r7,r11
+	xor r10,r8,r10
+	and r11,r11,r29
+	and r10,r10,r0
+	slw r9,r3,r9
+	sraw r4,r4,r6
+	xor r7,r7,r11
+	or r9,r9,r4
+	xor r8,r8,r10
+	stw r8,8(r5)
+	stw r7,0(r5)
+	stw r9,4(r5)
+	b L49
+L91:
 	lwz r9,8(r29)
 	b L88
+L93:
+	lwz r9,8(r29)
+	stfd f1,0(r9)
+	b L49
+L92:
+	lwz r9,8(r29)
+	stfs f1,0(r9)
+	b L49
 L89:
 	lwz r9,8(r29)
 	sth r3,0(r9)
@@ -161,14 +263,6 @@ L89:
 L90:
 	lwz r9,8(r29)
 	stb r3,0(r9)
-	b L49
-L98:
-	lwz r9,8(r29)
-	stfd f1,0(r9)
-	b L49
-L97:
-	lwz r9,8(r29)
-	stfs f1,0(r9)
 	b L49
 L87:
 	lwz r12,24(r29)

@@ -1,5 +1,5 @@
 dnl AUTOCONF configuration for LIBFFCALL
-dnl Copyright 1995-2020 Bruno Haible <bruno@clisp.org>
+dnl Copyright 1995-2024 Bruno Haible <bruno@clisp.org>
 dnl Copyright 2003-2010 Sam Steingold <sds@gnu.org>
 dnl
 dnl This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@ dnl
 
 AC_INIT([GNU libffcall],m4_normalize(m4_esyscmd([cat VERSION])),[https://savannah.gnu.org/projects/libffcall],[libffcall])
 AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIRS([m4 gnulib-m4])
 AM_INIT_AUTOMAKE([])
 
 AC_CONFIG_SRCDIR([trampoline/trampoline.h])
@@ -57,7 +58,6 @@ AC_PROG_MAKE_SET
 dnl The libraries are built in C.
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_GCC_TRADITIONAL
 CL_CC_GCC
 CL_AS_UNDERSCORE
 dnl But some tests use C++.
@@ -94,6 +94,25 @@ CL_PROG_LN
 gl_EARLY
 
 gl_HOST_CPU_C_ABI
+if test ${HOST_CPU_C_ABI} = arm -o ${HOST_CPU_C_ABI} = armhf; then
+  dnl On arm, there are two slightly different syntaxes for assembly language:
+  dnl The "divided" syntax (standard since ca. 2000) and the "unified" syntax
+  dnl (supported by GNU binutils since 2009).  See
+  dnl https://sourceware.org/binutils/docs/as/ARM_002dInstruction_002dSet.html .
+  dnl Add a suffix, to distinguish
+  dnl   platforms which expect the pre-2009 "divided" syntax
+  dnl from
+  dnl   platforms which can work with (or even require) the newer "unified"
+  dnl   syntax.
+  dnl For example, FreeBSD 12/arm requires the "unified" syntax, since it
+  dnl comes with clang 10 (which doesn't grok old "divided" syntax) and with
+  dnl an old GNU as (which doesn't grok the '.fpu vfpv3-d16' pseudo-op).
+  case "$host_os" in
+    *eabi*) HOST_CPU_C_ABI="${HOST_CPU_C_ABI}-eabi" ;;
+    *)      HOST_CPU_C_ABI="${HOST_CPU_C_ABI}-old" ;;
+  esac
+fi
+
 FFCALL_ENDIANNESS
 
 PACKAGE=libffcall
@@ -103,6 +122,10 @@ dnl Checks for trampoline, trampoline_r.
 AC_CHECK_HEADERS([unistd.h])
 gl_FUNC_MMAP_ANON
 FFCALL_CODEEXEC
+gl_CHECK_FUNCS_ANDROID([setmntent],
+  [[#include <stdio.h>
+    #include <mntent.h>
+  ]])
 
 dnl List of object files for trampoline, trampoline_r.
 CPU_OBJECTS=''

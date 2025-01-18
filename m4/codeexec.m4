@@ -1,5 +1,5 @@
 dnl -*- Autoconf -*-
-dnl Copyright (C) 1993-2020 Free Software Foundation, Inc.
+dnl Copyright (C) 1993-2024 Free Software Foundation, Inc.
 dnl This file is free software, distributed under the terms of the GNU
 dnl General Public License as published by the Free Software Foundation;
 dnl either version 2 of the License, or (at your option) any later version.
@@ -347,7 +347,7 @@ AC_DEFUN([FFCALL_CODEEXEC],
          case "$host_os" in
            aix* | cygwin* | darwin* | hpux* | irix* | linux* | solaris*)
              cl_cv_func_mprotect_works="guessing yes" ;;
-           mingw*)
+           mingw* | windows*)
              cl_cv_func_mprotect_works="guessing no" ;;
            *)
              cl_cv_func_mprotect_works="guessing no" ;;
@@ -372,65 +372,81 @@ AC_DEFUN([FFCALL_CODEEXEC],
         yes--*yes)
           AC_CACHE_CHECK([whether mprotect can make malloc()ed memory executable],
             [ffcall_cv_malloc_mprotect_can_exec],
-            [dnl On RHEL 6 / CentOS 6 with SELinux enabled, the result of
-             dnl this test depends on SELinux flags that can be changed at
-             dnl runtime: By default, the result is 'no'. However, when the flag
-             dnl allow_execheap is turned on, the result is 'yes'. But the flag
-             dnl can be turned off again at any moment.
-             if test "$cross_compiling" != yes -a -d /etc/selinux; then
-               ffcall_cv_malloc_mprotect_can_exec='determined by SELinux at runtime'
-             else
-               AC_RUN_IFELSE(
-                 [AC_LANG_SOURCE([[
-                    #include <errno.h>
-                    #include <stdlib.h>
-                    /* Declare getpagesize().  */
-                    #ifdef HAVE_UNISTD_H
-                     #include <unistd.h>
-                    #endif
-                    #ifdef __hpux
-                     extern
-                     #ifdef __cplusplus
-                     "C"
-                     #endif
-                     int getpagesize (void);
-                    #endif
-                    #include <fcntl.h>
-                    /* Declare mprotect().  */
-                    #include <sys/mman.h>
-                    int
-                    main ()
-                    {
-                      unsigned int pagesize = getpagesize ();
-                      char *p = (char *) malloc (50);
-                      int ret;
-                      if (p == (char*) -1)
-                        /* malloc is not working as expected. */
-                        return 1;
-                      p[5] = 0x77;
-                      ret = mprotect (p - ((unsigned int) p & (pagesize - 1)), pagesize, PROT_READ | PROT_WRITE | PROT_EXEC);
-                      if (ret < 0
-                          && (errno == EACCES || errno == ENOMEM || errno == ENOTSUP))
-                        /* mprotect is forbidden to make malloc()ed pages executable that were writable earlier. */
-                        return 2;
-                      return 0;
-                    }
-                    ]])
-                 ],
-                 [ffcall_cv_malloc_mprotect_can_exec=yes],
-                 [ffcall_cv_malloc_mprotect_can_exec=no],
-                 [dnl When cross-compiling, assume SELinux on Linux.
-                  dnl If we don't know, assume the worst.
-                  case "$host_os" in
-                    linux*)
-                      ffcall_cv_malloc_mprotect_can_exec='determined by SELinux at runtime' ;;
-                    aix* | cygwin* | darwin* | irix* | solaris*)
-                      ffcall_cv_malloc_mprotect_can_exec="guessing yes" ;;
-                    *)
-                      ffcall_cv_malloc_mprotect_can_exec="guessing no" ;;
-                  esac
-                 ])
-             fi
+            [case "$host_os" in
+               linux*)
+                 dnl On RHEL 6 / CentOS 6 with SELinux enabled, the result of
+                 dnl this test depends on SELinux flags that can be changed at
+                 dnl runtime: By default, the result is 'no'. However, when the
+                 dnl flag allow_execheap is turned on, the result is 'yes'. But
+                 dnl the flag can be turned off again at any moment, for example
+                 dnl by changing the file /etc/selinux/config.
+                 dnl See https://akkadia.org/drepper/selinux-mem.html .
+                 ffcall_cv_malloc_mprotect_can_exec='determined by SELinux at runtime'
+                 ;;
+               freebsd* | dragonfly*)
+                 dnl On FreeBSD, the result of this test depends on the sysctl
+                 dnl flag kern.elf32.allow_wx or kern.elf64.allow_wx. It can be
+                 dnl changed at any moment, by editing the file /etc/sysctl.conf.
+                 ffcall_cv_malloc_mprotect_can_exec='determined by sysctl at runtime'
+                 ;;
+               netbsd*)
+                 dnl On NetBSD, the result of this test depends on the sysctl
+                 dnl flags security.pax.mprotect.enabled
+                 dnl and   security.pax.mprotect.global.
+                 dnl See https://man.netbsd.org/sysctl.7 . They can be changed
+                 dnl at any moment, by editing the file /etc/sysctl.conf.
+                 ffcall_cv_malloc_mprotect_can_exec='determined by sysctl at runtime'
+                 ;;
+               *)
+                 AC_RUN_IFELSE(
+                   [AC_LANG_SOURCE([[
+                      #include <errno.h>
+                      #include <stdlib.h>
+                      /* Declare getpagesize().  */
+                      #ifdef HAVE_UNISTD_H
+                       #include <unistd.h>
+                      #endif
+                      #ifdef __hpux
+                       extern
+                       #ifdef __cplusplus
+                       "C"
+                       #endif
+                       int getpagesize (void);
+                      #endif
+                      #include <fcntl.h>
+                      /* Declare mprotect().  */
+                      #include <sys/mman.h>
+                      int
+                      main ()
+                      {
+                        unsigned int pagesize = getpagesize ();
+                        char *p = (char *) malloc (50);
+                        int ret;
+                        if (p == (char*) -1)
+                          /* malloc is not working as expected. */
+                          return 1;
+                        p[5] = 0x77;
+                        ret = mprotect (p - ((unsigned int) p & (pagesize - 1)), pagesize, PROT_READ | PROT_WRITE | PROT_EXEC);
+                        if (ret < 0
+                            && (errno == EACCES || errno == ENOMEM || errno == ENOTSUP))
+                          /* mprotect is forbidden to make malloc()ed pages executable that were writable earlier. */
+                          return 2;
+                        return 0;
+                      }
+                      ]])
+                   ],
+                   [ffcall_cv_malloc_mprotect_can_exec=yes],
+                   [ffcall_cv_malloc_mprotect_can_exec=no],
+                   [dnl When cross-compiling, assume the worst.
+                    case "$host_os" in
+                      aix* | cygwin* | darwin* | irix* | solaris*)
+                        ffcall_cv_malloc_mprotect_can_exec="guessing yes" ;;
+                      *)
+                        ffcall_cv_malloc_mprotect_can_exec="guessing no" ;;
+                    esac
+                   ])
+                 ;;
+             esac
             ])
           case "$ffcall_cv_malloc_mprotect_can_exec" in
             *yes)      MPROTECT_AFTER_MALLOC_CAN_EXEC=1 ;;
@@ -439,95 +455,319 @@ AC_DEFUN([FFCALL_CODEEXEC],
           esac
           AC_DEFINE_UNQUOTED([HAVE_MPROTECT_AFTER_MALLOC_CAN_EXEC], [$MPROTECT_AFTER_MALLOC_CAN_EXEC],
             [have an mprotect() function that can make malloc()ed memory pages executable])
+          AC_CACHE_CHECK([whether mprotect can make mmap()ed memory executable],
+            [ffcall_cv_mmap_mprotect_can_exec],
+            [case "$host_os" in
+               linux*)
+                 dnl On RHEL 6 / CentOS 6 with SELinux enabled, the result
+                 dnl of this test depends on SELinux flags that can be
+                 dnl changed at runtime: By default, the result is 'yes'.
+                 dnl However, when the flags allow_execmem and allow_execstack
+                 dnl are turned off, the result is 'no'. Similarly on
+                 dnl RHEL 7 / CentOS 7, where the result by default is 'no'.
+                 dnl These flags can be turned on or off, for example by
+                 dnl changing the file /etc/selinux/config.
+                 dnl See https://akkadia.org/drepper/selinux-mem.html .
+                 ffcall_cv_mmap_mprotect_can_exec='determined by SELinux at runtime'
+                 ;;
+               freebsd* | dragonfly*)
+                 dnl On FreeBSD, the result of this test depends on the sysctl
+                 dnl flag kern.elf32.allow_wx or kern.elf64.allow_wx. It can be
+                 dnl changed at any moment, by editing the file /etc/sysctl.conf.
+                 ffcall_cv_mmap_mprotect_can_exec='determined by sysctl at runtime'
+                 ;;
+               netbsd*)
+                 dnl On NetBSD, the result of this test depends on the sysctl
+                 dnl flags security.pax.mprotect.enabled
+                 dnl and   security.pax.mprotect.global.
+                 dnl See https://man.netbsd.org/sysctl.7 . They can be changed
+                 dnl at any moment, by editing the file /etc/sysctl.conf.
+                 ffcall_cv_mmap_mprotect_can_exec='determined by sysctl at runtime'
+                 ;;
+               *)
+                 AC_RUN_IFELSE(
+                   [AC_LANG_SOURCE([[
+                      #include <errno.h>
+                      #include <stdlib.h>
+                      /* Declare getpagesize().  */
+                      #ifdef HAVE_UNISTD_H
+                       #include <unistd.h>
+                      #endif
+                      #ifdef __hpux
+                       extern
+                       #ifdef __cplusplus
+                       "C"
+                       #endif
+                       int getpagesize (void);
+                      #endif
+                      #include <fcntl.h>
+                      /* Declare mmap(), mprotect().  */
+                      #include <sys/mman.h>
+                      #ifndef MAP_FILE
+                       #define MAP_FILE 0
+                      #endif
+                      #ifndef MAP_VARIABLE
+                       #define MAP_VARIABLE 0
+                      #endif
+                      int
+                      main ()
+                      {
+                        unsigned int pagesize = getpagesize ();
+                        char *p;
+                        int ret;
+                      #if HAVE_MMAP_ANONYMOUS
+                        p = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_VARIABLE, -1, 0);
+                      #elif HAVE_MMAP_DEVZERO
+                        int zero_fd = open("/dev/zero", O_RDONLY, 0666);
+                        if (zero_fd < 0)
+                          return 1;
+                        p = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_FILE | MAP_VARIABLE, zero_fd, 0);
+                      #else
+                        ??
+                      #endif
+                        if (p == (char*) -1)
+                          /* mmap is not working as expected. */
+                          return 1;
+                        p[5] = 0x77;
+                        ret = mprotect (p, pagesize, PROT_READ | PROT_WRITE | PROT_EXEC);
+                        if (ret < 0
+                            && (errno == EACCES || errno == ENOMEM || errno == ENOTSUP))
+                          /* mprotect is forbidden to make mmap()ed pages executable that were writable earlier. */
+                          return 2;
+                        return 0;
+                      }
+                      ]])
+                   ],
+                   [ffcall_cv_mmap_mprotect_can_exec=yes],
+                   [ffcall_cv_mmap_mprotect_can_exec=no],
+                   [dnl When cross-compiling, assume the worst.
+                    case "$host_os" in
+                      *) ffcall_cv_mmap_mprotect_can_exec="guessing no" ;;
+                    esac
+                   ])
+                 ;;
+             esac
+            ])
+          case "$ffcall_cv_mmap_mprotect_can_exec" in
+            *yes)      MPROTECT_AFTER_MMAP_CAN_EXEC=1 ;;
+            *no)       MPROTECT_AFTER_MMAP_CAN_EXEC=0 ;;
+            *runtime*) MPROTECT_AFTER_MMAP_CAN_EXEC='-1' ;;
+          esac
+          AC_DEFINE_UNQUOTED([HAVE_MPROTECT_AFTER_MMAP_CAN_EXEC], [$MPROTECT_AFTER_MMAP_CAN_EXEC],
+            [have an mprotect() function that can make mmap()ed memory pages executable])
           case "$ffcall_cv_malloc_mprotect_can_exec" in
             *yes) ;;
             *)
-              AC_CACHE_CHECK([whether mprotect can make mmap()ed memory executable],
-                [ffcall_cv_mmap_mprotect_can_exec],
-                [dnl On RHEL 6 / CentOS 6 with SELinux enabled, the result of
-                 dnl this test depends on SELinux flags that can be changed at
-                 dnl runtime: By default, the result is 'yes'. However, when the flags
-                 dnl allow_execmem and allow_execstack are turned off, the result is
-                 dnl 'no'.
-                 if test "$cross_compiling" != yes -a -d /etc/selinux; then
-                   ffcall_cv_mmap_mprotect_can_exec='determined by SELinux at runtime'
-                 else
-                   AC_RUN_IFELSE(
-                     [AC_LANG_SOURCE([[
-                        #include <errno.h>
-                        #include <stdlib.h>
-                        /* Declare getpagesize().  */
-                        #ifdef HAVE_UNISTD_H
-                         #include <unistd.h>
-                        #endif
-                        #ifdef __hpux
-                         extern
-                         #ifdef __cplusplus
-                         "C"
-                         #endif
-                         int getpagesize (void);
-                        #endif
-                        #include <fcntl.h>
-                        /* Declare mmap(), mprotect().  */
-                        #include <sys/mman.h>
-                        #ifndef MAP_FILE
-                         #define MAP_FILE 0
-                        #endif
-                        #ifndef MAP_VARIABLE
-                         #define MAP_VARIABLE 0
-                        #endif
-                        int
-                        main ()
-                        {
-                          unsigned int pagesize = getpagesize ();
-                          char *p;
-                          int ret;
-                        #if HAVE_MMAP_ANONYMOUS
-                          p = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_VARIABLE, -1, 0);
-                        #elif HAVE_MMAP_DEVZERO
-                          int zero_fd = open("/dev/zero", O_RDONLY, 0666);
-                          if (zero_fd < 0)
-                            return 1;
-                          p = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_FILE | MAP_VARIABLE, zero_fd, 0);
-                        #else
-                          ??
-                        #endif
-                          if (p == (char*) -1)
-                            /* mmap is not working as expected. */
-                            return 1;
-                          p[5] = 0x77;
-                          ret = mprotect (p, pagesize, PROT_READ | PROT_WRITE | PROT_EXEC);
-                          if (ret < 0
-                              && (errno == EACCES || errno == ENOMEM || errno == ENOTSUP))
-                            /* mprotect is forbidden to make mmap()ed pages executable that were writable earlier. */
-                            return 2;
-                          return 0;
-                        }
-                        ]])
-                     ],
-                     [ffcall_cv_mmap_mprotect_can_exec=yes],
-                     [ffcall_cv_mmap_mprotect_can_exec=no],
-                     [dnl When cross-compiling, assume SELinux on Linux.
-                      dnl If we don't know, assume the worst.
-                      case "$host_os" in
-                        linux*) ffcall_cv_mmap_mprotect_can_exec='determined by SELinux at runtime' ;;
-                        *)      ffcall_cv_mmap_mprotect_can_exec="guessing no" ;;
-                      esac
-                     ])
-                 fi
-                ])
-              case "$ffcall_cv_mmap_mprotect_can_exec" in
-                *yes)      MPROTECT_AFTER_MMAP_CAN_EXEC=1 ;;
-                *no)       MPROTECT_AFTER_MMAP_CAN_EXEC=0 ;;
-                *runtime*) MPROTECT_AFTER_MMAP_CAN_EXEC='-1' ;;
-              esac
-              AC_DEFINE_UNQUOTED([HAVE_MPROTECT_AFTER_MMAP_CAN_EXEC], [$MPROTECT_AFTER_MMAP_CAN_EXEC],
-                [have an mprotect() function that can make mmap()ed memory pages executable])
               case "$ffcall_cv_mmap_mprotect_can_exec" in
                 *yes) ;;
                 *)
-                  AC_CACHE_CHECK([whether a shared mmap can make memory pages executable],
-                    [ffcall_cv_mmap_shared_can_exec],
+                  case "$host_os" in
+                    darwin*)
+                      # This is expected to work on macOS only.
+                      # Here we use the approach with Mach primitives that exist
+                      # since macOS 10.4. It was invented by Joelle van Dyne for QEMU.
+                      # It is a lot simpler than the MAP_JIT approach that is
+                      # propagated by Apple but incompletely documented and
+                      # changes behaviour whenever Apple wants to improve "security".
+                      AC_CACHE_CHECK([whether a shared mmap with macOS primitives can make memory pages executable],
+                        [ffcall_cv_mmap_shared_macos_can_exec],
+                        [AC_RUN_IFELSE(
+                           [AC_LANG_SOURCE([[
+                              #include <stdlib.h>
+                              /* Declare getpagesize().  */
+                              #include <unistd.h>
+                              /* Declare mmap().  */
+                              #include <sys/mman.h>
+                              /* Declare mach_vm_remap.  */
+                              #include <mach/mach.h>
+                              /* Declaring it ourselves is easier than
+                                 including <mach/mach_vm.h>.  */
+                              extern
+                              #ifdef __cplusplus
+                              "C"
+                              #endif
+                              kern_return_t mach_vm_remap (vm_map_t target_task,
+                                                           mach_vm_address_t *target_address, /* in/out */
+                                                           mach_vm_size_t size,
+                                                           mach_vm_offset_t mask,
+                                                           int flags,
+                                                           vm_map_t src_task,
+                                                           mach_vm_address_t src_address,
+                                                           boolean_t copy,
+                                                           vm_prot_t *cur_protection, /* out */
+                                                           vm_prot_t *max_protection, /* out */
+                                                           vm_inherit_t inheritance);
+                              int
+                              main ()
+                              {
+                                unsigned int pagesize = getpagesize ();
+                                char *pw;
+                                char *px;
+                                pw = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+                                if (pw == (char*) -1)
+                                  return 2;
+                                pw[5] = 0xc3;
+                                {
+                                  vm_map_t self = mach_task_self ();
+                                  mach_vm_address_t target_address = 0;
+                                  vm_prot_t cur_prot;
+                                  vm_prot_t max_prot;
+                                  kern_return_t ret = mach_vm_remap (self, &target_address, pagesize, 0, VM_FLAGS_ANYWHERE, self, (mach_vm_address_t) (unsigned long) pw, FALSE, &cur_prot, &max_prot, VM_INHERIT_NONE);
+                                  if (ret != KERN_SUCCESS)
+                                    return 3;
+                                  px = (char *) (unsigned long) target_address;
+                                }
+                                if (mprotect (px, pagesize, PROT_READ | PROT_EXEC) < 0)
+                                  return 4;
+                                if ((char)px[5] != (char)0xc3)
+                                  return 5;
+                                /* On i386 and x86_64 this is a 'ret' instruction that we can invoke. */
+                              #if (defined __i386 || defined __i386__ || defined _I386 || defined _M_IX86 || defined _X86_) || (defined __x86_64__ || defined __amd64__)
+                                ((void (*) (void)) (px + 5)) ();
+                              #endif
+                                return 0;
+                              }
+                              ]])
+                           ],
+                           [ffcall_cv_mmap_shared_macos_can_exec=yes],
+                           [ffcall_cv_mmap_shared_macos_can_exec=no],
+                           [dnl When cross-compiling, assume yes, since this is the result
+                            dnl on all the platforms where we have tested it.
+                            ffcall_cv_mmap_shared_macos_can_exec="guessing yes"
+                           ])
+                        ])
+                      case "$ffcall_cv_mmap_shared_macos_can_exec" in
+                        *yes)
+                          AC_DEFINE([HAVE_MMAP_SHARED_MACOS_CAN_EXEC], [1],
+                            [have an mmap() function that, together with mach_vm_remap(), can make memory pages executable])
+                          ;;
+                      esac
+                      ;;
+                  esac
+                  AC_CACHE_CHECK([whether a shared mmap with NetBSD primitives can make memory pages executable],
+                    [ffcall_cv_mmap_shared_netbsd_can_exec],
+                    [AC_RUN_IFELSE(
+                       [AC_LANG_SOURCE([[
+                          /* Enable the PROT_MPROTECT declaration on NetBSD.  */
+                          #ifndef _NETBSD_SOURCE
+                           #define _NETBSD_SOURCE 1
+                          #endif
+                          #include <stdlib.h>
+                          /* Declare getpagesize().  */
+                          #ifdef HAVE_UNISTD_H
+                           #include <unistd.h>
+                          #endif
+                          /* Declare mmap() and mremap().  */
+                          #include <sys/mman.h>
+                          int
+                          main ()
+                          {
+                            unsigned int pagesize = getpagesize ();
+                            char *pw;
+                            char *px;
+                            pw = (char *) mmap (NULL, pagesize, (PROT_READ | PROT_WRITE) | PROT_MPROTECT (PROT_READ | PROT_WRITE | PROT_EXEC), MAP_PRIVATE | MAP_ANON, -1, 0);
+                            if (pw == (char*) -1)
+                              return 2;
+                            pw[5] = 0xc3;
+                            px = (char *) mremap (pw, pagesize, NULL, pagesize, MAP_REMAPDUP);
+                            if (px == (char*) -1)
+                              return 3;
+                            if (mprotect (px, pagesize, PROT_READ | PROT_EXEC) < 0)
+                              return 4;
+                            if ((char)px[5] != (char)0xc3)
+                              return 5;
+                            /* On i386 and x86_64 this is a 'ret' instruction that we can invoke. */
+                          #if (defined __i386 || defined __i386__ || defined _I386 || defined _M_IX86 || defined _X86_) || (defined __x86_64__ || defined __amd64__)
+                            ((void (*) (void)) (px + 5)) ();
+                          #endif
+                            return 0;
+                          }
+                          ]])
+                       ],
+                       [ffcall_cv_mmap_shared_netbsd_can_exec=yes],
+                       [ffcall_cv_mmap_shared_netbsd_can_exec=no],
+                       [dnl When cross-compiling, assume yes, since this is the result
+                        dnl on all the platforms where we have tested it.
+                        ffcall_cv_mmap_shared_netbsd_can_exec="guessing yes"
+                       ])
+                    ])
+                  case "$ffcall_cv_mmap_shared_netbsd_can_exec" in
+                    *yes)
+                      AC_DEFINE([HAVE_MMAP_SHARED_NETBSD_CAN_EXEC], [1],
+                        [have an mmap() function that, together with mremap(), can make memory pages executable])
+                      ;;
+                  esac
+                  gl_CHECK_FUNCS_ANDROID([memfd_create],
+                    [[#include <sys/mman.h>]])
+                  if test $ac_cv_func_memfd_create = yes; then
+                    AC_CACHE_CHECK([whether a shared mmap of a RAM-only region can make memory pages executable],
+                      [ffcall_cv_mmap_shared_memfd_can_exec],
+                      [filename="trampdata$$"
+                       AC_RUN_IFELSE(
+                         [AC_LANG_SOURCE([[
+                            /* Enable the memfd_create declaration on Linux.  */
+                            #ifndef _GNU_SOURCE
+                             #define _GNU_SOURCE 1
+                            #endif
+                            #include <fcntl.h>
+                            #include <stdlib.h>
+                            /* Declare getpagesize().  */
+                            #ifdef HAVE_UNISTD_H
+                             #include <unistd.h>
+                            #endif
+                            /* Declare mmap() and memfd_create().  */
+                            #include <sys/mman.h>
+                            #ifndef MAP_FILE
+                             #define MAP_FILE 0
+                            #endif
+                            #ifndef MAP_VARIABLE
+                             #define MAP_VARIABLE 0
+                            #endif
+                            int
+                            main ()
+                            {
+                              unsigned int pagesize = getpagesize ();
+                              int fd;
+                              char *pw;
+                              char *px;
+                              fd = memfd_create ("$filename", 0);
+                              if (fd < 0)
+                                return 1;
+                              if (ftruncate (fd, pagesize) < 0)
+                                return 2;
+                               pw = (char *) mmap (NULL, pagesize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+                              if (pw == (char*) -1)
+                                return 3;
+                              pw[5] = 0xc3;
+                              px = (char *) mmap (NULL, pagesize, PROT_READ | PROT_EXEC, MAP_SHARED, fd, 0);
+                              if (px == (char*) -1)
+                                return 4;
+                              if ((char)px[5] != (char)0xc3)
+                                return 5;
+                              /* On i386 and x86_64 this is a 'ret' instruction that we can invoke. */
+                            #if (defined __i386 || defined __i386__ || defined _I386 || defined _M_IX86 || defined _X86_) || (defined __x86_64__ || defined __amd64__)
+                              ((void (*) (void)) (px + 5)) ();
+                            #endif
+                              return 0;
+                            }
+                            ]])
+                         ],
+                         [ffcall_cv_mmap_shared_memfd_can_exec=yes],
+                         [ffcall_cv_mmap_shared_memfd_can_exec=no],
+                         [dnl When cross-compiling, assume yes, since this is the result
+                          dnl on all the platforms where we have tested it.
+                          ffcall_cv_mmap_shared_memfd_can_exec="guessing yes"
+                         ])
+                      ])
+                    case "$ffcall_cv_mmap_shared_memfd_can_exec" in
+                      *yes)
+                        AC_DEFINE([HAVE_MMAP_SHARED_MEMFD_CAN_EXEC], [1],
+                          [have an mmap() function that, with MAP_SHARED on a memfd descriptor, can make memory pages executable])
+                        ;;
+                    esac
+                  fi
+                  AC_CACHE_CHECK([whether a shared mmap of a file can make memory pages executable],
+                    [ffcall_cv_mmap_shared_posix_can_exec],
                     [filename="/tmp/trampdata$$.data"
                      AC_RUN_IFELSE(
                        [AC_LANG_SOURCE([[
@@ -581,18 +821,18 @@ AC_DEFUN([FFCALL_CODEEXEC],
                           }
                           ]])
                        ],
-                       [ffcall_cv_mmap_shared_can_exec=yes],
-                       [ffcall_cv_mmap_shared_can_exec=no],
+                       [ffcall_cv_mmap_shared_posix_can_exec=yes],
+                       [ffcall_cv_mmap_shared_posix_can_exec=no],
                        [dnl When cross-compiling, assume yes, since this is the result
                         dnl on all the platforms where we have tested it.
-                        ffcall_cv_mmap_shared_can_exec="guessing yes"
+                        ffcall_cv_mmap_shared_posix_can_exec="guessing yes"
                        ])
                      rm -f "$filename"
                     ])
-                  case "$ffcall_cv_mmap_shared_can_exec" in
+                  case "$ffcall_cv_mmap_shared_posix_can_exec" in
                     *yes)
-                      AC_DEFINE([HAVE_MMAP_SHARED_CAN_EXEC], [1],
-                        [have an mmap() function that, with MAP_SHARED, can make memory pages executable])
+                      AC_DEFINE([HAVE_MMAP_SHARED_POSIX_CAN_EXEC], [1],
+                        [have an mmap() function that, with MAP_SHARED on a file, can make memory pages executable])
                       ;;
                   esac
                   ;;

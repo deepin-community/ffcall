@@ -19,13 +19,14 @@ precompiled : \
   vacall-sparc-macro.S vacall-sparc64-macro.S \
   vacall-alpha-macro.S \
   vacall-hppa-macro.S vacall-hppa64-macro.S \
-  vacall-arm-macro.S vacall-armhf-macro.S \
+  vacall-arm-old-macro.S vacall-arm-eabi-macro.S vacall-armhf-eabi-macro.S \
   vacall-arm64-macro.S vacall-arm64-macos-macro.S \
   vacall-powerpc-aix.s vacall-powerpc-linux-macro.S vacall-powerpc-sysv4-macro.S vacall-powerpc-macos.s vacall-powerpc64-aix.s vacall-powerpc64-linux.S vacall-powerpc64-elfv2-linux.S \
   vacall-ia64-macro.S \
   vacall-x86_64-macro.S vacall-x86_64-x32-linux.s vacall-x86_64-windows-macro.S \
   vacall-s390-macro.S vacall-s390x-macro.S \
-  vacall-riscv32-ilp32d-macro.S vacall-riscv64-lp64d-macro.S
+  vacall-riscv32-ilp32d-macro.S vacall-riscv64-lp64d-macro.S \
+  vacall-loongarch64-macro.S
 
 
 vacall-i386-linux.s : ../../vacall/vacall-i386.c ../../vacall/vacall-internal.h vacall_r.h $(THISFILE)
@@ -119,19 +120,27 @@ vacall-hppa64-macro.S : vacall-hppa64-linux.s ../../common/asm-hppa64.sh ../../c
 	(echo '#include "asm-hppa64.h"' ; ../../common/asm-hppa64.sh < vacall-hppa64-linux.s ; cat ../../common/noexecstack.h) > vacall-hppa64-macro.S
 
 
-vacall-arm-macro.S : ../../vacall/vacall-arm.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-arm.sh ../../common/noexecstack-arm.h $(THISFILE)
+vacall-arm-old-macro.S : ../../vacall/vacall-arm.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-arm.sh ../../common/noexecstack-arm.h $(THISFILE)
 	$(CROSS_TOOL) arm-linux gcc -V 3.1 -mlittle-endian $(GCCFLAGS) -D__arm__ -S ../../vacall/vacall-arm.c -I../../vacall -I. -o vacall-armel.s
 	$(CROSS_TOOL) arm-linux gcc -V 3.1 -mbig-endian $(GCCFLAGS) -D__arm__ -S ../../vacall/vacall-arm.c -I../../vacall -I. -o vacall-armeb.s
 	cmp vacall-armel.s vacall-armeb.s > /dev/null
-	(echo '#include "asm-arm.h"' ; ../../common/asm-arm.sh < vacall-armel.s ; cat ../../common/noexecstack-arm.h) > vacall-arm-macro.S
+	(echo '#include "asm-arm.h"' ; ../../common/asm-arm.sh < vacall-armel.s ; cat ../../common/noexecstack-arm.h) > vacall-arm-old-macro.S
 	$(RM) vacall-armel.s vacall-armeb.s
 
-vacall-armhf-macro.S : ../../vacall/vacall-armhf.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-arm.sh ../../common/noexecstack-arm.h $(THISFILE)
+vacall-arm-eabi-macro.S : ../../vacall/vacall-arm.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-arm.sh ../../common/noexecstack-arm.h $(THISFILE)
 # The option -mabi=aapcs ensures an 8-bytes-aligned stack pointer.
-	$(CROSS_TOOL) armv7l-linux-gnueabihf gcc-6.5.0 -march=armv6 -mabi=aapcs -mfloat-abi=hard -mlittle-endian $(GCCFLAGS) -D__armhf__ -S ../../vacall/vacall-armhf.c -I../../vacall -I. -o vacall-armhfel.s
-	$(CROSS_TOOL) armv7l-linux-gnueabihf gcc-6.5.0 -march=armv6 -mabi=aapcs -mfloat-abi=hard -mbig-endian $(GCCFLAGS) -D__armhf__ -S ../../vacall/vacall-armhf.c -I../../vacall -I. -o vacall-armhfeb.s
+	$(CROSS_TOOL) arm-linux-gnueabi gcc-6.5.0 -march=armv4t -mabi=aapcs -mfloat-abi=soft -fno-short-enums -masm-syntax-unified -mlittle-endian $(GCCFLAGS) -S ../../vacall/vacall-arm.c -I../../vacall -I. -o vacall-armel.s
+	$(CROSS_TOOL) arm-linux-gnueabi gcc-6.5.0 -march=armv4t -mabi=aapcs -mfloat-abi=soft -fno-short-enums -masm-syntax-unified -mbig-endian $(GCCFLAGS) -S ../../vacall/vacall-arm.c -I../../vacall -I. -o vacall-armeb.s
+	cmp vacall-armel.s vacall-armeb.s > /dev/null
+	(echo '#include "asm-arm.h"' ; ../../common/asm-arm.sh < vacall-armel.s ; cat ../../common/noexecstack-arm.h) > vacall-arm-eabi-macro.S
+	$(RM) vacall-armel.s vacall-armeb.s
+
+vacall-armhf-eabi-macro.S : ../../vacall/vacall-armhf.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-arm.sh ../../common/noexecstack-arm.h $(THISFILE)
+# The option -mabi=aapcs ensures an 8-bytes-aligned stack pointer.
+	$(CROSS_TOOL) armv7l-linux-gnueabihf gcc-6.5.0 -march=armv6 -mabi=aapcs -mfloat-abi=hard -masm-syntax-unified -mlittle-endian $(GCCFLAGS) -D__armhf__ -S ../../vacall/vacall-armhf.c -I../../vacall -I. -o vacall-armhfel.s
+	$(CROSS_TOOL) armv7l-linux-gnueabihf gcc-6.5.0 -march=armv6 -mabi=aapcs -mfloat-abi=hard -masm-syntax-unified -mbig-endian $(GCCFLAGS) -D__armhf__ -S ../../vacall/vacall-armhf.c -I../../vacall -I. -o vacall-armhfeb.s
 	cmp vacall-armhfel.s vacall-armhfeb.s > /dev/null
-	(echo '#include "asm-arm.h"' ; ../../common/asm-arm.sh < vacall-armhfel.s ; cat ../../common/noexecstack-arm.h) > vacall-armhf-macro.S
+	(echo '#include "asm-arm.h"' ; ../../common/asm-arm.sh < vacall-armhfel.s ; cat ../../common/noexecstack-arm.h) > vacall-armhf-eabi-macro.S
 	$(RM) vacall-armhfel.s vacall-armhfeb.s
 
 
@@ -179,8 +188,7 @@ vacall-powerpc64-linux.S : ../../vacall/vacall-powerpc64.c ../../vacall/vacall-i
 vacall-powerpc64-elfv2-linux.S : ../../vacall/vacall-powerpc64.c ../../vacall/vacall-internal.h vacall_r.h ../../common/asm-powerpc.sh ../../common/noexecstack.h $(THISFILE)
 	$(CROSS_TOOL) powerpc64le-linux gcc-5.4.0 -mabi=elfv2 -mcpu=power4 -mlittle-endian $(GCCFLAGS) -D__powerpc64__ -D__powerpc64_elfv2__ -S ../../vacall/vacall-powerpc64.c -I../../vacall -I. -o vacall-powerpc64-elfv2-linux-le.s
 	$(CROSS_TOOL) powerpc64le-linux gcc-5.4.0 -mabi=elfv2 -mcpu=power4 -mbig-endian $(GCCFLAGS) -D__powerpc64__ -D__powerpc64_elfv2__ -S ../../vacall/vacall-powerpc64.c -I../../vacall -I. -o vacall-powerpc64-elfv2-linux-be.s
-# vacall-powerpc64-linux-be.s contains endianness specific optimizations.
-	(../../common/asm-powerpc.sh < vacall-powerpc64-elfv2-linux-le.s ; cat ../../common/noexecstack.h) > vacall-powerpc64-elfv2-linux.S
+	(echo '#ifdef __LITTLE_ENDIAN__' ; ../../common/asm-powerpc.sh < vacall-powerpc64-elfv2-linux-le.s ; echo '#else' ; ../../common/asm-powerpc.sh < vacall-powerpc64-elfv2-linux-be.s ; echo '#endif' ; cat ../../common/noexecstack.h) > vacall-powerpc64-elfv2-linux.S
 	$(RM) vacall-powerpc64-elfv2-linux-le.s vacall-powerpc64-elfv2-linux-be.s
 
 
@@ -233,3 +241,10 @@ vacall-riscv64-lp64d-linux.s : ../../vacall/vacall-riscv64.c ../../vacall/vacall
 
 vacall-riscv64-lp64d-macro.S : vacall-riscv64-lp64d-linux.s ../../common/asm-riscv.sh ../../common/noexecstack.h $(THISFILE)
 	(../../common/asm-riscv.sh < vacall-riscv64-lp64d-linux.s ; cat ../../common/noexecstack.h) > vacall-riscv64-lp64d-macro.S
+
+
+vacall-loongarch64-linux.s : ../../vacall/vacall-loongarch64.c ../../vacall/vacall-internal.h vacall_r.h $(THISFILE)
+	$(CROSS_TOOL) loongarch64-linux gcc-12.1.0 $(GCCFLAGS) -D__loongarch64__ -S ../../vacall/vacall-loongarch64.c -I../../vacall -I. -o vacall-loongarch64-linux.s
+
+vacall-loongarch64-macro.S : vacall-loongarch64-linux.s ../../common/asm-loongarch.sh ../../common/noexecstack.h $(THISFILE)
+	(../../common/asm-loongarch.sh < vacall-loongarch64-linux.s ; cat ../../common/noexecstack.h) > vacall-loongarch64-macro.S

@@ -7,9 +7,9 @@ vacall_receiver:
 	@ args = 20, pretend = 16, frame = 32
 	@ frame_needed = 1, uses_anonymous_args = 0
 	mov	ip, sp
-	sub	sp, sp, #16
+	sub	sp, sp, #-4294967280
 	stmfd	sp!, {fp, ip, lr, pc}
-	sub	fp, ip, #20
+	sub	fp, ip, #-4294967276
 	add	lr, fp, #4
 	mov	ip, #0
 	sub	sp, sp, #32

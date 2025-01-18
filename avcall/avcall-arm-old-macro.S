@@ -8,7 +8,7 @@ FUNBEGIN(avcall_call)
 	// frame_needed = 1, uses_anonymous_args = 0
 	mov	ip, sp
 	stmfd	sp!, {r4, r5, fp, ip, lr, pc}
-	sub	fp, ip, $4
+	sub	fp, ip, $-4294967292
 	sub	sp, sp, $1024
 	add	r2, r0, $20
 	ldmia	r2, {r2, r3}

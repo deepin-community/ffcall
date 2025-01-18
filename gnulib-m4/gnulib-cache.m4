@@ -1,8 +1,8 @@
-# Copyright (C) 2002-2021 Free Software Foundation, Inc.
+# Copyright (C) 2002-2024 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 3 of the License, or
+# the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
 # This file is distributed in the hope that it will be useful,
@@ -28,30 +28,30 @@
 
 # Specification in the form of a command-line invocation:
 # gnulib-tool --import \
+#  --local-dir=gnulib-local \
 #  --lib=libgnu \
 #  --source-base=gnulib-lib \
 #  --m4-base=gnulib-m4 \
 #  --doc-base=doc \
 #  --tests-base=tests \
 #  --aux-dir=build-aux \
-#  --no-conditional-dependencies \
+#  --gpl=2 \
+#  --conditional-dependencies \
 #  --libtool \
 #  --macro-prefix=gl \
 #  ansi-c++-opt \
-#  clean-temp-simple \
 #  host-cpu-c-abi \
-#  lock \
+#  libffcall-imports \
 #  nocrash \
 #  stdint \
 #  stdnoreturn
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
-gl_LOCAL_DIR([])
+gl_LOCAL_DIR([gnulib-local])
 gl_MODULES([
   ansi-c++-opt
-  clean-temp-simple
   host-cpu-c-abi
-  lock
+  libffcall-imports
   nocrash
   stdint
   stdnoreturn
@@ -63,7 +63,9 @@ gl_PO_BASE([])
 gl_DOC_BASE([doc])
 gl_TESTS_BASE([tests])
 gl_LIB([libgnu])
+gl_GPL([2])
 gl_MAKEFILE_NAME([])
+gl_CONDITIONAL_DEPENDENCIES
 gl_LIBTOOL
 gl_MACRO_PREFIX([gl])
 gl_PO_DOMAIN([])
